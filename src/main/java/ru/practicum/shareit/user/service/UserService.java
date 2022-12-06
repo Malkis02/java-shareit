@@ -14,25 +14,25 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public User create(User user){
+    public User create(User user) {
         return userRepository.create(user);
     }
 
-    public User update(User user,Long userid){
-        userRepository.update(user,userid);
+    public User update(User user, Long userid) {
+        userRepository.update(user, userid);
         user.setId(userid);
         return user;
     }
 
-    public void delete(Long userId){
+    public void delete(Long userId) {
         userRepository.delete(userId);
     }
 
-    public User get(Long userId){
+    public User get(Long userId) {
         return userRepository.get(userId);
     }
 
-    public List<User> getAll(){
+    public List<User> getAll() {
         return userRepository.getAll();
     }
 }

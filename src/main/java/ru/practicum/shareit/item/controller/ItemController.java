@@ -35,23 +35,32 @@ public class ItemController {
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> updateItem(@Min(1L) @PathVariable Long itemId,
-                                              @RequestHeader("X-Sharer-User-Id") Long userId,
-                                              @Valid @RequestBody UpdateItemDto item){
-        return ResponseEntity.status(HttpStatus.CREATED)
+                                                      @RequestHeader("X-Sharer-User-Id") Long userId,
+                                                      @Valid @RequestBody UpdateItemDto item){
+        return ResponseEntity.status(HttpStatus.OK)
                 .body(itemMapper.mapToItemDto(itemService.update(itemMapper.mapToItem(item,userId),itemId)));
     }
 
     @GetMapping("{itemId}")
-    public ResponseEntity<ItemDto> getItem(@Min(1L) @PathVariable Long itemId,
-                                           @RequestHeader("X-Sharer-User-Id") Long userId){
+    public ResponseEntity<ItemDto> getItem(@Min(1L) @PathVariable Long itemId){
         return ResponseEntity.status(HttpStatus.OK).body(itemMapper.mapToItemDto(itemService.get(itemId)));
     }
 
     @GetMapping
     public ResponseEntity<List<ItemDto>> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId){
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.getAll(userId).stream().map(itemMapper::mapToItemDto).collect(Collectors.toList()));
+                .body(itemService.getAll(userId)
+                        .stream()
+                        .map(itemMapper::mapToItemDto)
+                        .collect(Collectors.toList()));
     }
 
-    //@GetMapping
+    @GetMapping("search")
+    public ResponseEntity<List<ItemDto>> search(@RequestParam String text){
+        return ResponseEntity.status(HttpStatus.OK)
+                .body(itemService.search(text)
+                        .stream()
+                        .map(itemMapper::mapToItemDto)
+                        .collect(Collectors.toList()));
+    }
 }

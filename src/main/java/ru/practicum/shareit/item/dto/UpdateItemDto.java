@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
@@ -20,8 +19,8 @@ public class UpdateItemDto {
     private String description;
 
     private Boolean available;
-    @JsonIgnore
+
     private UserDto owner;
-    @JsonIgnore
+
     private ItemRequestDto request;
 }

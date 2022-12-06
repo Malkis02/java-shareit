@@ -17,9 +17,4 @@ public class Booking {
     private LocalTime end;
     private Item item;
     private User booker;
-    private enum status{
-        WAITING,
-        APPROVED,
-        REJECTED
-    }
 }

@@ -11,46 +11,43 @@ import java.util.stream.Collectors;
 
 @Repository
 @Slf4j
-public class InMemoryUserRepository implements UserRepository{
+public class InMemoryUserRepository implements UserRepository {
 
-    private final Map<Long,User> userById = new HashMap<>();
+    private final Map<Long, User> userById = new HashMap<>();
 
     Long curId = 1L;
 
     @Override
     public User create(User user) {
-        for(User email: userById.values()) {
+        for (User email : userById.values()) {
             if (email.getEmail().contains(user.getEmail())) {
                 throw new EmailAlreadyExistException("Email занят");
             }
         }
         user.setId(curId);
-        userById.put(user.getId(),user);
+        userById.put(user.getId(), user);
         curId++;
         return user;
     }
 
     @Override
-    public User update(User user,Long userId) {
+    public User update(User user, Long userId) {
         User savedUser = userById.get(userId);
-        List<String> userEmail = userById.values()
-                .stream()
-                .map(User::getEmail)
-                .collect(Collectors.toList());
-        if(userEmail.contains(user.getEmail())){
+        List<String> userEmail = userById.values().stream().map(User::getEmail).collect(Collectors.toList());
+        if (userEmail.contains(user.getEmail())) {
             throw new EmailAlreadyExistException("Email занят");
         }
-        if(Objects.isNull(savedUser)) {
+        if (Objects.isNull(savedUser)) {
             throw new IdValidationException("Юзер отсутсвует");
         }
-        if(user.getName()==null){
+        if (user.getName() == null) {
             user.setName(savedUser.getName());
         }
-        if(user.getEmail()==null){
+        if (user.getEmail() == null) {
             user.setEmail(savedUser.getEmail());
         }
         userById.remove(savedUser.getId());
-        userById.put(userId,user);
+        userById.put(userId, user);
         return user;
     }
 
