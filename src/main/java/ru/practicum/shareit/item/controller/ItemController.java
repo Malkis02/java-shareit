@@ -7,12 +7,10 @@ import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.service.ItemService;
-
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.stream.Collectors;
-
 
 @RestController
 @RequestMapping("/items")
@@ -26,6 +24,7 @@ public class ItemController {
         this.itemService = itemService;
         this.itemMapper = itemMapper;
     }
+    
     @PostMapping
     public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @Valid @RequestBody ItemDto item){
