@@ -62,5 +62,4 @@ public class ItemController {
                         .map(itemMapper::mapToItemDto)
                         .collect(Collectors.toList()));
     }
-    
 }
