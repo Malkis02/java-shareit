@@ -5,10 +5,7 @@ import org.springframework.stereotype.Repository;
 import ru.practicum.shareit.exception.IdValidationException;
 import ru.practicum.shareit.item.model.Item;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -72,7 +69,7 @@ public class InMemoryItemRepository implements ItemRepository {
         if (items.size() != 0) {
             return items;
         } else {
-            throw new IdValidationException("Вещь не найдена");
+            return Collections.emptyList();
         }
     }
 

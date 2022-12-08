@@ -2,13 +2,13 @@ package ru.practicum.shareit.booking;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.model.User;
 
 import java.time.LocalTime;
 
-@Data
+@Getter
 @AllArgsConstructor
 @Builder
 public class Booking {

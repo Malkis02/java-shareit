@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -20,9 +21,10 @@ public class ItemService {
     private final UserService userService;
 
 
+
     public Item create(Item item) {
-        List<User> users = userService.getAll();
-        if (users.contains(userService.get(item.getOwner().getId()))) {
+        User user = userService.get(item.getOwner().getId());
+        if (Objects.nonNull(user)) {
             return itemRepository.create(item);
         } else {
             throw new NotFoundException("Пользователя с таким id нет");
@@ -51,7 +53,7 @@ public class ItemService {
 
     private void validate(Long itemId, Item item) {
         if (!itemRepository.checkItem(item.getOwner().getId(), itemId)) {
-            throw new NotFoundException("gsdgg");
+            throw new NotFoundException("Такого пользователя нет");
         }
     }
 }

@@ -9,7 +9,6 @@ public class EmailAlreadyExistException extends RuntimeException {
         super(s);
     }
 
-    @Override
     public String getMessage() {
         return super.getMessage();
     }

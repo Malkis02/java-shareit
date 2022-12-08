@@ -46,7 +46,6 @@ public class InMemoryUserRepository implements UserRepository {
         if (user.getEmail() == null) {
             user.setEmail(savedUser.getEmail());
         }
-        userById.remove(savedUser.getId());
         userById.put(userId, user);
         return user;
     }

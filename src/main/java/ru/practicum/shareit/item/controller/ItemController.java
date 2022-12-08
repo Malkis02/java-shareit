@@ -40,7 +40,7 @@ public class ItemController {
                 .body(itemMapper.mapToItemDto(itemService.update(itemMapper.mapToItem(item,userId),itemId)));
     }
 
-    @GetMapping("{itemId}")
+    @GetMapping("/{itemId}")
     public ResponseEntity<ItemDto> getItem(@Min(1L) @PathVariable Long itemId) {
         return ResponseEntity.status(HttpStatus.OK).body(itemMapper.mapToItemDto(itemService.get(itemId)));
     }

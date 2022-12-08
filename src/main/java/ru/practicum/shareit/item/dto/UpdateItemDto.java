@@ -5,9 +5,7 @@ import lombok.Getter;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.user.dto.UserDto;
 
-import javax.validation.Valid;
 
-@Valid
 @Getter
 @AllArgsConstructor
 public class UpdateItemDto {
