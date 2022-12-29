@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import ru.practicum.shareit.user.dto.UpdateUserDto;
 import ru.practicum.shareit.user.dto.UserDto;
 import ru.practicum.shareit.user.mapper.UserMapper;
 import ru.practicum.shareit.user.service.UserService;
@@ -31,9 +32,9 @@ public class UserController {
 
     @PatchMapping("{userId}")
     public ResponseEntity<UserDto> updateUser(@Min(1L) @PathVariable Long userId,
-                                              @RequestBody UserDto user) {
+                                              @RequestBody UpdateUserDto user) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(userMapper.mapper.mapToUserDto(userService.update(userMapper.mapper.mapToUser(user), userId)));
+                .body(userMapper.mapper.mapToUserDto(userService.update(userMapper.mapper.mapToUser(user),userId)));
     }
 
     @GetMapping("{userId}")

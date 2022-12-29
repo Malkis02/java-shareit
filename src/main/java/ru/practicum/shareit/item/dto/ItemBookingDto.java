@@ -1,9 +1,7 @@
-package ru.practicum.shareit.item.model;
+package ru.practicum.shareit.item.dto;
 
 import lombok.*;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
-import ru.practicum.shareit.item.entity.CommentEntity;
-import ru.practicum.shareit.user.entity.UserEntity;
 
 import java.util.Set;
 
@@ -12,8 +10,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Item {
-
+public class ItemBookingDto {
     private Long id;
 
     private String name;
@@ -22,13 +19,9 @@ public class Item {
 
     private Boolean available;
 
-    private UserEntity owner;
-
-    private Set<CommentEntity> comments;
+    private Set<CommentDto> comments;
 
     private BookingShortDto lastBooking;
 
     private BookingShortDto nextBooking;
-
-    //private ItemRequestDto request;
 }
