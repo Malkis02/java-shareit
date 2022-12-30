@@ -21,11 +21,4 @@ public class ItemDto {
     @NotNull
     private Boolean available;
 
-    //private Set<CommentDto> comments;
-
-//    private LastBookingDto lastBooking;
-//
-//    private NextBookingDto nextBooking;
-
-    //private ItemRequestDto request;
 }

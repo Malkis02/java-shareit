@@ -30,5 +30,4 @@ public class Item {
 
     private BookingShortDto nextBooking;
 
-    //private ItemRequestDto request;
 }

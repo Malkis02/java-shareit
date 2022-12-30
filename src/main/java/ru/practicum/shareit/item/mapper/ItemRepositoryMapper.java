@@ -21,12 +21,6 @@ public interface ItemRepositoryMapper {
 
     Item toItem(ItemEntity entity);
 
-//    @Mapping(target = "lastBooking.id",source = "owner.id")
-//    //@Mapping(target = "")
-//    ItemBookingDto toItemBookingDto(ItemEntity entity);
-
-//    @Mapping(target = "owner.id",source = "lastBooking.bookerId")
-//    Item toItem(ItemBookingDto itemBookingDto);
 
     ItemEntity toItemEntity(Item item);
 

@@ -22,6 +22,7 @@ import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
 import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.sql.Timestamp;
@@ -72,23 +73,23 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemBookingDto get(Long itemId,Long userId) {
-        ItemEntity item = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
-        ItemBookingDto itemBookingDto = itemMapper.toItemBookingDto(item);
+        ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
+        Item item = mapper.toItem(itemStored);
         if (item.getOwner().getId().equals(userId)) {
-                BookingShortDto lastBooking =
-                        bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(
-                                item,Timestamp.valueOf(LocalDateTime.now()))
-                                .map(bookingRepositoryMapper::toLastBookingDto)
-                                .orElse(null);
-                BookingShortDto nextBooking = bookingRepository.findFirstByItemAndStartAfterOrderByStartAsc(
-                                item,Timestamp.valueOf(LocalDateTime.now()))
-                        .map(bookingRepositoryMapper::toLastBookingDto)
-                        .orElse(null);
-                itemBookingDto.setLastBooking(lastBooking);
-                itemBookingDto.setNextBooking(nextBooking);
-
+            BookingShortDto lastBooking =
+                    bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(
+                                    itemStored, Timestamp.valueOf(LocalDateTime.now()))
+                            .map(bookingRepositoryMapper::toLastBookingDto)
+                            .orElse(null);
+            BookingShortDto nextBooking = bookingRepository.findFirstByItemAndStartAfterOrderByStart(
+                            itemStored, Timestamp.valueOf(LocalDateTime.now()))
+                    .map(bookingRepositoryMapper::toLastBookingDto)
+                    .orElse(null);
+            item.setLastBooking(lastBooking);
+            item.setNextBooking(nextBooking);
         }
-        return itemBookingDto;
+        item.setComments(new HashSet<>(commentRepository.findAllByItem(itemStored)));
+        return itemMapper.toItemBookingDto(item);
     }
 
     @Override
@@ -109,7 +110,7 @@ public class ItemServiceImpl implements ItemService {
                                 item, Timestamp.valueOf(LocalDateTime.now()))
                         .map(bookingRepositoryMapper::toLastBookingDto)
                         .orElse(null));
-                itemBookingDto.setNextBooking(bookingRepository.findFirstByItemAndStartAfterOrderByStartAsc(
+                itemBookingDto.setNextBooking(bookingRepository.findFirstByItemAndStartAfterOrderByStart(
                                 item, Timestamp.valueOf(LocalDateTime.now()))
                         .map(bookingRepositoryMapper::toLastBookingDto)
                         .orElse(null));
@@ -129,9 +130,6 @@ public class ItemServiceImpl implements ItemService {
             throw new NotFoundException();
         }
         if (comment.getText().isEmpty() || comment.getText().isBlank()) {
-            throw new ItemNotAvailableException();
-        }
-        if (Objects.isNull(item.getNextBooking()) || Objects.isNull(item.getLastBooking())) {
             throw new ItemNotAvailableException();
         }
         if (!bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(

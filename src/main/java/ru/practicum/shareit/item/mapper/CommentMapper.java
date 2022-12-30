@@ -18,8 +18,8 @@ public interface CommentMapper {
     CommentDto toCommentDto(Comment comment);
 
     @Mapping(target = "id",source = "id")
-    @Mapping(target = "author.name",source = "authorName")
     @Mapping(target = "text",source = "text")
+    @Mapping(target = "author.name",source = "authorName")
     @Mapping(target = "created",source = "created")
     Comment toComment(CommentDto comment);
 

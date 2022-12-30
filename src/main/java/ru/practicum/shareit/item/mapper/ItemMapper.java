@@ -13,7 +13,8 @@ import ru.practicum.shareit.user.mapper.UserMapper;
 @Mapper(componentModel = "spring", uses = {
         UserMapper.class,
         CommentMapper.class,
-        BookingRepositoryMapper.class
+        BookingRepositoryMapper.class,
+        CommentRepositoryMapper.class
 })
 public interface ItemMapper {
 
@@ -23,7 +24,6 @@ public interface ItemMapper {
     Item mapToItem(ItemDto itemDto, Long userId);
 
     @Mapping(target = "id", ignore = true)
-   // @Mapping(target = "request", ignore = true)
     @Mapping(target = "owner.id", source = "userId")
     Item mapToItem(UpdateItemDto itemDto, Long userId);
 
@@ -31,6 +31,10 @@ public interface ItemMapper {
     @Mapping(target = "comments",source = "comments")
     ItemBookingDto toItemBookingDto(ItemEntity item);
 
+    @Mapping(target = "comments",source = "comments")
+    ItemBookingDto toItemBookingDto(Item item);
 
+    @Mapping(target = "comments",source = "comments")
     Item toItem(ItemBookingDto itemBookingDto);
+
 }

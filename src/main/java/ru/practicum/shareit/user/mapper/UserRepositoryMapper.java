@@ -11,10 +11,12 @@ import ru.practicum.shareit.user.model.User;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserRepositoryMapper {
 
+    @Mapping(target = "name",source = "name")
     User toUser(UserEntity entity);
 
     UserEntity toEntity(User user);
 
     @Mapping(target = "id",ignore = true)
+    @Mapping(target = "name",source = "name")
     void updateEntity(User user, @MappingTarget UserEntity entity);
 }

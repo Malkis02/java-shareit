@@ -17,6 +17,5 @@ public class CommentDto {
 
     private String authorName;
 
-
     private Timestamp created;
 }
