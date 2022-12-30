@@ -13,8 +13,7 @@ import java.util.Set;
 public class ItemEntity {
 
     @Id
-    @SequenceGenerator(name = "pk_sequence",schema = "public",sequenceName = "items_id_seq",allocationSize = 1)
-    @GeneratedValue(strategy = GenerationType.SEQUENCE,generator = "pk_sequence")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",updatable = false,unique = true)
     private Long id;
 

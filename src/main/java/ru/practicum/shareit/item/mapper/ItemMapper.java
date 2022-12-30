@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
 import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -30,9 +29,8 @@ public interface ItemMapper {
 
     @Mapping(target = "id",source = "id")
     @Mapping(target = "comments",source = "comments")
-    @Mapping(target = "lastBooking.bookerId",source = "owner.id")
     ItemBookingDto toItemBookingDto(ItemEntity item);
 
-    @Mapping(target = "owner.id",source = "lastBooking.bookerId")
+
     Item toItem(ItemBookingDto itemBookingDto);
 }

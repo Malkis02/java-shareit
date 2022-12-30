@@ -29,7 +29,7 @@ public interface BookingRepositoryMapper {
 
     @Mapping(target = "id",source = "id")
     @Mapping(target = "bookerId",source = "booker.id")
-    BookingShortDto toLastBookingDto(Booking booking);
+    BookingShortDto toLastBookingDto(BookingEntity booking);
 
     @Mapping(target = "start",source = "start",qualifiedByName = "convertToTimestamp")
     @Mapping(target = "end",source = "end",qualifiedByName = "convertToTimestamp")

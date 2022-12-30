@@ -4,12 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import ru.practicum.shareit.booking.entity.BookingEntity;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingStatus;
+import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
 import java.sql.Timestamp;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
 
@@ -55,7 +56,9 @@ public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
 
 
 
-    Booking findFirstByItemId_AndAndStartIsBeforeOrderByStartDesc(Long itemId, Timestamp start);
+    Optional<BookingEntity> findFirstByItemAndStartBeforeOrderByStartDesc(ItemEntity item, Timestamp start);
 
-    Booking findFirstByItemId_AndStartIsAfterOrderByStartAsc(Long itemId, Timestamp start);
+    Optional<BookingEntity> findFirstByItemAndStartAfterOrderByStartAsc(ItemEntity item, Timestamp start);
+
+    boolean existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(Long itemId, Long bookerId, BookingStatus status, Timestamp end);
 }

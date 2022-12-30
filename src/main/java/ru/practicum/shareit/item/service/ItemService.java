@@ -19,6 +19,7 @@ public interface ItemService {
 
     Comment createComment(Comment comment, Long itemId, Long userId);
 
+    Item getItem(Long itemId);
 
 
 }

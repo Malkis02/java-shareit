@@ -9,7 +9,6 @@ import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.*;
-import ru.practicum.shareit.item.mapper.ItemMapper;
 import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
@@ -40,13 +39,12 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemRepositoryMapper itemRepositoryMapper;
 
-    private final ItemMapper itemMapper;
 
 
     @Override
     public Booking create(Booking booking,Long userId,Long itemId) {
         User user = userService.get(userId);
-        Item item = itemMapper.toItem(itemService.get(itemId,userId));
+        Item item = itemService.getItem(itemId);
         validation(booking);
         if (Objects.isNull(item) && Objects.isNull(user)) {
             throw new NotFoundException("Юзер или вещь не найдены");
