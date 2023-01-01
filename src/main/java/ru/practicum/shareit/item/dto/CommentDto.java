@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.dto;
 
 import lombok.*;
-
+import ru.practicum.shareit.item.dto.ItemDto;
 import java.sql.Timestamp;
 
 @Getter
@@ -14,6 +14,8 @@ public class CommentDto {
     private Long id;
 
     private String text;
+
+    private ItemDto item;
 
     private String authorName;
 

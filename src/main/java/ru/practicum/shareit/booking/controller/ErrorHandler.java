@@ -13,20 +13,20 @@ public class ErrorHandler {
 
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalTimeException(final IllegalTimeException e) {
-        log.info("400 {}",e.getMessage());
+        log.info("400 {}", e.getMessage());
         return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleItemNotAvailableException(final ItemNotAvailableException e) {
-        log.info("400 {}",e.getMessage());
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        log.info("400 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     public ResponseEntity<String> handleNotFoundException(final NotFoundException e) {
-        log.info("404 {}",e.getMessage());
-        return new ResponseEntity<>(e.getMessage(),HttpStatus.NOT_FOUND);
+        log.info("404 {}", e.getMessage());
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 
 
@@ -34,7 +34,7 @@ public class ErrorHandler {
     public ResponseEntity<ErrorResponse> handleUnsupportedStateException(final UnsupportedStateException e) {
         final String error = "Unknown state: UNSUPPORTED_STATUS";
         log.warn(error);
-        return new ResponseEntity<>(new ErrorResponse(error),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(new ErrorResponse(error), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler

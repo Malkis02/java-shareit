@@ -32,14 +32,14 @@ public class BookingController {
                                                     @Valid @RequestBody BookingCreateRequestDto booking) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(mapper.toBookingDto(bookingService
-                        .create(mapper.toBooking(booking),userId, booking.getItemId())));
+                        .create(mapper.toBooking(booking), userId, booking.getItemId())));
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDto> getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                @Min(1L) @PathVariable Long bookingId) {
+                                                 @Min(1L) @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapper.toBookingDto(bookingService.get(bookingId,userId)));
+                .body(mapper.toBookingDto(bookingService.get(bookingId, userId)));
     }
 
     @PatchMapping("/{bookingId}")
@@ -47,25 +47,25 @@ public class BookingController {
                                                            @RequestHeader("X-Sharer-User-Id") Long userId,
                                                            @Min(1L) @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapper.toBookingUpdateResponseDto(bookingService.approve(bookingId,userId,approved)));
+                .body(mapper.toBookingUpdateResponseDto(bookingService.approve(bookingId, userId, approved)));
     }
 
     @GetMapping
     public ResponseEntity<List<BookingDto>> getAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL",required = false) BookingState state) throws UnsupportedStateException {
+            @RequestParam(defaultValue = "ALL", required = false) BookingState state) throws UnsupportedStateException {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookingService.getAll(userId,state).stream()
+                .body(bookingService.getAll(userId, state).stream()
                         .map(mapper::toBookingDto)
                         .collect(Collectors.toList()));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDto>> getOwnerItemsAll(
-            @RequestParam(defaultValue = "ALL",required = false) BookingState state,
+            @RequestParam(defaultValue = "ALL", required = false) BookingState state,
             @RequestHeader("X-Sharer-User-Id") Long userId) throws UnsupportedStateException {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookingService.getAllOwnerItems(userId,state).stream()
+                .body(bookingService.getAllOwnerItems(userId, state).stream()
                         .map(mapper::toBookingDto)
                         .collect(Collectors.toList()));
     }

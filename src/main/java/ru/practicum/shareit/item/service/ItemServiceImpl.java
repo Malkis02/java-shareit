@@ -2,6 +2,7 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
@@ -11,6 +12,7 @@ import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
+import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.CommentRepositoryMapper;
@@ -53,16 +55,14 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
+    @Transactional
     public Item create(Item item,Long userId) {
         User user = userService.get(userId);
-        if (Objects.nonNull(user)) {
             return mapper.toItem(itemRepository.save(mapper.toItemEntity(item)));
-        } else {
-            throw new NotFoundException();
-        }
     }
 
     @Override
+    @Transactional
     public Item update(Item item, Long itemId) {
         validate(itemId, item);
         ItemEntity stored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
@@ -71,6 +71,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public ItemBookingDto get(Long itemId,Long userId) {
         ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
         Item item = mapper.toItem(itemStored);
@@ -92,6 +93,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Item getItem(Long itemId) {
         return itemRepository.findById(itemId)
                 .map(mapper::toItem)
@@ -99,6 +101,7 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<ItemBookingDto> getAll(Long userId) {
         List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId);
         List<ItemBookingDto> itemList = new ArrayList<>();
@@ -119,15 +122,10 @@ public class ItemServiceImpl implements ItemService {
         return itemList;
     }
 
+    @Transactional
     public Comment createComment(Comment comment,Long itemId,Long userId) {
         User user = userService.get(userId);
         ItemBookingDto item = get(itemId,userId);
-        Set<CommentDto> comments = new HashSet<>();
-        comments.add(commentMapper.toCommentDto(comment));
-
-        if (Objects.isNull(user) || Objects.isNull(item)) {
-            throw new NotFoundException();
-        }
         if (comment.getText().isEmpty() || comment.getText().isBlank()) {
             throw new ItemNotAvailableException();
         }
@@ -136,15 +134,15 @@ public class ItemServiceImpl implements ItemService {
                 throw new ItemNotAvailableException();
         }
         comment.setAuthor(userMapper.toEntity(user));
-        comment.getAuthor().setName(user.getName());
-        comment.setItem(mapper.toItemEntity(itemMapper.toItem(item)));
-        comment.setText(comment.getText());
         comment.setCreated(Timestamp.valueOf(LocalDateTime.now()));
-        item.setComments(comments);
-        return commentRepositoryMapper.toComment(commentRepository.save(commentRepositoryMapper.toEntity(comment)));
+        comment.setItem(mapper.toItemEntity(itemMapper.toItem(item)));
+        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment);
+        Comment stored = commentRepositoryMapper.toComment(commentRepository.save(commentEntity));
+        return stored;
     }
 
 
+    @Transactional(readOnly = true)
     public List<Item> search(String text) {
         if (!StringUtils.hasText(text)) {
             return Collections.emptyList();

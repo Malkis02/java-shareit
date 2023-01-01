@@ -2,6 +2,7 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.booking.model.Booking;
@@ -46,9 +47,6 @@ public class BookingServiceImpl implements BookingService {
         User user = userService.get(userId);
         Item item = itemService.getItem(itemId);
         validation(booking);
-        if (Objects.isNull(item) && Objects.isNull(user)) {
-            throw new NotFoundException("Юзер или вещь не найдены");
-        }
         if (!item.getAvailable()) {
             throw new ItemNotAvailableException();
         }
@@ -62,6 +60,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Booking get(Long bookingId,Long userId) {
         Booking booking = repository.findById(bookingId)
                 .map(mapper::toBooking)
@@ -74,6 +73,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Booking> getAll(Long userId,BookingState state) throws UnsupportedStateException {
         List<BookingEntity> result;
         UserEntity booker = userMapper.toEntity(userService.get(userId));
@@ -106,6 +106,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional(readOnly = true)
     public List<Booking> getAllOwnerItems(Long userId, BookingState state) throws UnsupportedStateException {
         List<BookingEntity> result;
         UserEntity owner = userMapper.toEntity(userService.get(userId));
@@ -138,6 +139,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
+    @Transactional
     public Booking approve(Long bookingId, Long userId, Boolean approved) {
         BookingEntity stored = repository.findById(bookingId)
                 .orElseThrow(NotFoundException::new);

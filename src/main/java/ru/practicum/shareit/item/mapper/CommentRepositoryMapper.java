@@ -13,9 +13,19 @@ import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
 public interface CommentRepositoryMapper {
 
     @Mapping(target = "author",source = "author")
+    @Mapping(target = "author.name",source = "author.name")
+    @Mapping(target = "item",source = "item")
+    @Mapping(target = "item.id",source = "item.id")
+    @Mapping(target = "text",source = "text")
+    @Mapping(target = "id",source = "id")
     Comment toComment(CommentEntity entity);
 
     @Mapping(target = "author",source = "author")
+    @Mapping(target = "author.name",source = "author.name")
+    @Mapping(target = "item",source = "item")
+    @Mapping(target = "item.id",source = "item.id")
+    @Mapping(target = "text",source = "text")
+    @Mapping(target = "id",source = "id")
     CommentEntity toEntity(Comment comment);
 
 }
