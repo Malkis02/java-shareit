@@ -50,7 +50,7 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.equals(userId,item.getOwner().getId())) {
             throw new NotFoundException("Нельзя брать в аренду у самого себя");
         }
-        if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())){
+        if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())) {
             if (Objects.equals(item.getLastBooking().getStart(),booking.getStart()) ||
                     Objects.equals(item.getLastBooking().getEnd(),booking.getEnd())) {
                 throw new NotFoundException("Уже есть бронирование на это время");

@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.entity.UserEntity;
 
 import java.sql.Timestamp;
 import java.util.List;
-import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
     List<BookingEntity> findAllByBookerOrderByStartDesc(UserEntity booker);
