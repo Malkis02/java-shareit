@@ -2,7 +2,6 @@ package ru.practicum.shareit.user.model;
 
 import lombok.*;
 
-import javax.persistence.*;
 
 @Getter
 @Setter
@@ -10,7 +9,6 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Builder
 public class User  {
-
     private Long id;
 
     private String name;

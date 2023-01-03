@@ -7,7 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class UpdateUserDto {
-
     private Long id;
 
 

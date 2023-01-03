@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 @NoArgsConstructor
 @Builder
 public class Comment {
-
     private Long id;
 
     private String text;

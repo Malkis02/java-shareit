@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping(path = "/bookings")
 public class BookingController {
-
     private final BookingService bookingService;
 
     private final BookingMapper mapper;

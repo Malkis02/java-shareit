@@ -13,7 +13,6 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "bookings")
 public class BookingEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, unique = true,nullable = false)
@@ -25,11 +24,9 @@ public class BookingEntity {
     @Column(name = "end_date",nullable = false)
     private Timestamp end;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booker_id",nullable = false)
     private UserEntity booker;
-
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)

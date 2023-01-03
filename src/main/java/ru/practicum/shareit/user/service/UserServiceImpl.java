@@ -7,32 +7,30 @@ import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.repository.UserRepository;
 
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-
     private final UserRepository userRepository;
 
     private final UserRepositoryMapper mapper;
 
     @Override
-    public User create(User user) {
-        return mapper.toUser(userRepository.save(mapper.toEntity(user)));
+    public UserEntity create(UserEntity user) {
+        return userRepository.save(user);
     }
 
     @Override
     @Transactional
-    public User update(User user,Long userId) {
+    public UserEntity update(UserEntity user,Long userId) {
         UserEntity stored = userRepository.findById(userId).orElseThrow(NotFoundException::new);
         mapper.updateEntity(user,stored);
-        return mapper.toUser(userRepository.save(stored));
+        return userRepository.save(stored);
     }
 
     @Override
@@ -43,17 +41,14 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional(readOnly = true)
-    public User get(Long userId) {
+    public UserEntity get(Long userId) {
         return userRepository.findById(userId)
-                .map(mapper::toUser)
                 .orElseThrow(NotFoundException::new);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public List<User> getAll() {
-        return userRepository.findAll().stream()
-                .map(mapper::toUser)
-                .collect(Collectors.toList());
+    public List<UserEntity> getAll() {
+        return new ArrayList<>(userRepository.findAll());
     }
 }

@@ -7,7 +7,6 @@ import ru.practicum.shareit.exception.UnsupportedStateException;
 import java.util.List;
 
 public interface BookingService {
-
     Booking create(Booking booking, Long userId, Long itemId);
 
     Booking get(Long bookingId, Long userId);

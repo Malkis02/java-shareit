@@ -12,7 +12,6 @@ import java.sql.Timestamp;
 @Entity
 @Table(name = "comments")
 public class CommentEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", updatable = false, unique = true,nullable = false)

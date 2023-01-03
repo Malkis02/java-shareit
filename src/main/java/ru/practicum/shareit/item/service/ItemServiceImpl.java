@@ -10,6 +10,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.ItemEntity;
@@ -21,8 +22,7 @@ import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
-import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
-import ru.practicum.shareit.user.model.User;
+import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.sql.Timestamp;
@@ -36,8 +36,6 @@ public class ItemServiceImpl implements ItemService {
     private final ItemRepository itemRepository;
 
     private final UserService userService;
-
-    private final UserRepositoryMapper userMapper;
 
     private final BookingRepository bookingRepository;
 
@@ -56,7 +54,7 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional
     public Item create(Item item,Long userId) {
-        User user = userService.get(userId);
+        UserEntity user = userService.get(userId);
             return mapper.toItem(itemRepository.save(mapper.toItemEntity(item)));
     }
 
@@ -72,23 +70,35 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public ItemBookingDto get(Long itemId,Long userId) {
+        LocalDateTime now = LocalDateTime.now();
         ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
         Item item = mapper.toItem(itemStored);
+        Set<CommentDto> comments = commentRepository.findAllByItem(itemStored)
+                .stream()
+                .map(commentMapper::toCommentDto)
+                .collect(Collectors.toSet());
+
+        ItemBookingDto itemBookingDto = itemMapper.toItemBookingDto(item);
         if (item.getOwner().getId().equals(userId)) {
             BookingShortDto lastBooking =
-                    bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(
-                                    itemStored, Timestamp.valueOf(LocalDateTime.now()))
+                    bookingRepository.findAllByItem(
+                                    itemStored)
+                            .stream()
                             .map(bookingRepositoryMapper::toLastBookingDto)
+                            .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
+                            .max(Comparator.comparing(BookingShortDto::getStart))
                             .orElse(null);
-            BookingShortDto nextBooking = bookingRepository.findFirstByItemAndStartAfterOrderByStart(
-                            itemStored, Timestamp.valueOf(LocalDateTime.now()))
+            BookingShortDto nextBooking = bookingRepository.findAllByItem(
+                            itemStored)
+                    .stream()
                     .map(bookingRepositoryMapper::toLastBookingDto)
+                    .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
+                    .max(Comparator.comparing(BookingShortDto::getStart))
                     .orElse(null);
-            item.setLastBooking(lastBooking);
-            item.setNextBooking(nextBooking);
+            itemBookingDto.setLastBooking(lastBooking);
+            itemBookingDto.setNextBooking(nextBooking);
         }
-        item.setComments(new HashSet<>(commentRepository.findAllByItem(itemStored)));
-        return itemMapper.toItemBookingDto(item);
+        return itemBookingDto;
     }
 
     @Override
@@ -102,18 +112,25 @@ public class ItemServiceImpl implements ItemService {
     @Override
     @Transactional(readOnly = true)
     public List<ItemBookingDto> getAll(Long userId) {
+        LocalDateTime now = LocalDateTime.now();
         List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId);
         List<ItemBookingDto> itemList = new ArrayList<>();
         for (ItemEntity item:stored) {
             if (item.getOwner().getId().equals(userId)) {
                 ItemBookingDto itemBookingDto = itemMapper.toItemBookingDto(item);
-                itemBookingDto.setLastBooking(bookingRepository.findFirstByItemAndStartBeforeOrderByStartDesc(
-                                item, Timestamp.valueOf(LocalDateTime.now()))
+                itemBookingDto.setLastBooking(bookingRepository.findAllByItem(
+                                item)
+                        .stream()
                         .map(bookingRepositoryMapper::toLastBookingDto)
+                        .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
+                        .max(Comparator.comparing(BookingShortDto::getStart))
                         .orElse(null));
-                itemBookingDto.setNextBooking(bookingRepository.findFirstByItemAndStartAfterOrderByStart(
-                                item, Timestamp.valueOf(LocalDateTime.now()))
+                itemBookingDto.setNextBooking(bookingRepository.findAllByItem(
+                                item)
+                        .stream()
                         .map(bookingRepositoryMapper::toLastBookingDto)
+                        .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
+                        .max(Comparator.comparing(BookingShortDto::getStart))
                         .orElse(null));
                 itemList.add(itemBookingDto);
             }
@@ -123,8 +140,7 @@ public class ItemServiceImpl implements ItemService {
 
     @Transactional
     public Comment createComment(Comment comment,Long itemId,Long userId) {
-        User user = userService.get(userId);
-        ItemBookingDto item = get(itemId,userId);
+        UserEntity user = userService.get(userId);
         if (comment.getText().isEmpty() || comment.getText().isBlank()) {
             throw new ItemNotAvailableException();
         }
@@ -132,11 +148,9 @@ public class ItemServiceImpl implements ItemService {
                 itemId,userId, BookingStatus.APPROVED,Timestamp.valueOf(LocalDateTime.now()))) {
                 throw new ItemNotAvailableException();
         }
-        comment.setAuthor(userMapper.toEntity(user));
         comment.setCreated(Timestamp.valueOf(LocalDateTime.now()));
-        comment.setItem(mapper.toItemEntity(itemMapper.toItem(item)));
-        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment);
-        Comment stored = commentRepositoryMapper.toComment(commentRepository.save(commentEntity));
+        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment,user,itemId);
+        Comment stored = commentRepositoryMapper.toComment(commentRepository.save(commentEntity),user,itemId);
         return stored;
     }
 
@@ -155,7 +169,7 @@ public class ItemServiceImpl implements ItemService {
 
     private void validate(Long itemId, Item item) {
         Long itemOwnerId = itemRepository.findById(itemId).orElseThrow().getOwner().getId();
-        User user = userService.get(item.getOwner().getId());
+        UserEntity user = userService.get(item.getOwner().getId());
         if (!itemOwnerId.equals(user.getId())) {
             throw new NotFoundException();
         }

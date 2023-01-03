@@ -13,7 +13,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
-
     List<BookingEntity> findAllByBookerOrderByStartDesc(UserEntity booker);
 
     @Query("select b from BookingEntity b " +
@@ -56,9 +55,7 @@ public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
 
 
 
-    Optional<BookingEntity> findFirstByItemAndStartBeforeOrderByStartDesc(ItemEntity item, Timestamp start);
-
-    Optional<BookingEntity> findFirstByItemAndStartAfterOrderByStart(ItemEntity item, Timestamp start);
+    List<BookingEntity> findAllByItem(ItemEntity item);
 
     boolean existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
             Long itemId,

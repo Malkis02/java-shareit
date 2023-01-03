@@ -21,11 +21,15 @@ import java.time.LocalDateTime;
         },
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface BookingRepositoryMapper {
-
-
     @Mapping(target = "start",source = "start",qualifiedByName = "convertToLocalDateTime")
     @Mapping(target = "end",source = "end",qualifiedByName = "convertToLocalDateTime")
     Booking toBooking(BookingEntity entity);
+
+    @Mapping(target = "id",source = "id")
+    @Mapping(target = "booker.id",source = "bookerId")
+    @Mapping(target = "start",source = "start",qualifiedByName = "convertToTimestamp")
+    @Mapping(target = "end",source = "end",qualifiedByName = "convertToTimestamp")
+    BookingEntity mapToEntity(BookingShortDto bookingShortDto);
 
     @Mapping(target = "id",source = "id")
     @Mapping(target = "bookerId",source = "booker.id")

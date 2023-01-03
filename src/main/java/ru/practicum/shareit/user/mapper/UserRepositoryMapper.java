@@ -10,7 +10,6 @@ import ru.practicum.shareit.user.model.User;
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface UserRepositoryMapper {
-
     @Mapping(target = "name",source = "name")
     User toUser(UserEntity entity);
 
@@ -18,5 +17,5 @@ public interface UserRepositoryMapper {
 
     @Mapping(target = "id",ignore = true)
     @Mapping(target = "name",source = "name")
-    void updateEntity(User user, @MappingTarget UserEntity entity);
+    void updateEntity(UserEntity user, @MappingTarget UserEntity entity);
 }

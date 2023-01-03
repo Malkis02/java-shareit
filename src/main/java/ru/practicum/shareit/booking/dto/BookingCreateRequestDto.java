@@ -9,7 +9,6 @@ import java.time.LocalDateTime;
 @Getter
 @AllArgsConstructor
 public class BookingCreateRequestDto {
-
     @NotNull
     private Long itemId;
 

@@ -15,7 +15,6 @@ import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
-import ru.practicum.shareit.user.model.User;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.sql.Timestamp;
@@ -27,7 +26,6 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BookingServiceImpl implements BookingService {
-
     private final BookingRepository repository;
 
     private final UserService userService;
@@ -40,11 +38,10 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemRepositoryMapper itemRepositoryMapper;
 
-
-
     @Override
+    @Transactional
     public Booking create(Booking booking,Long userId,Long itemId) {
-        User user = userService.get(userId);
+        UserEntity user = userService.get(userId);
         Item item = itemService.getItem(itemId);
         validation(booking);
         if (!item.getAvailable()) {
@@ -53,8 +50,14 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.equals(userId,item.getOwner().getId())) {
             throw new NotFoundException("Нельзя брать в аренду у самого себя");
         }
+        if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())){
+            if (Objects.equals(item.getLastBooking().getStart(),booking.getStart()) ||
+                    Objects.equals(item.getLastBooking().getEnd(),booking.getEnd())) {
+                throw new NotFoundException("Уже есть бронирование на это время");
+            }
+        }
         booking.setItem(itemRepositoryMapper.toItemEntity(item));
-        booking.setBooker(userMapper.toEntity(user));
+        booking.setBooker(user);
         booking.setStatus(BookingStatus.WAITING);
         return mapper.toBooking(repository.save(mapper.toEntity(booking)));
     }
@@ -76,7 +79,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<Booking> getAll(Long userId,BookingState state) throws UnsupportedStateException {
         List<BookingEntity> result;
-        UserEntity booker = userMapper.toEntity(userService.get(userId));
+        UserEntity booker = userService.get(userId);
         switch (state) {
             case ALL:
                 result = repository.findAllByBookerOrderByStartDesc(booker);
@@ -109,7 +112,7 @@ public class BookingServiceImpl implements BookingService {
     @Transactional(readOnly = true)
     public List<Booking> getAllOwnerItems(Long userId, BookingState state) throws UnsupportedStateException {
         List<BookingEntity> result;
-        UserEntity owner = userMapper.toEntity(userService.get(userId));
+        UserEntity owner = userService.get(userId);
         switch (state) {
             case ALL:
                 result = repository.findAllByOwnerItems(owner);

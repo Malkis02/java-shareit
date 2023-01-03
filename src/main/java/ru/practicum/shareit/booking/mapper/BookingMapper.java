@@ -13,7 +13,6 @@ import ru.practicum.shareit.user.mapper.UserMapper;
         ItemMapper.class
 })
 public interface BookingMapper {
-
     @Mapping(target = "booker.id", source = "booker.id")
     @Mapping(target = "item.id", source = "item.id")
     @Mapping(target = "start", source = "start")

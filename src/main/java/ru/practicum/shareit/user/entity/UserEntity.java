@@ -10,7 +10,6 @@ import javax.persistence.*;
 @Entity
 @Table(name = "users")
 public class UserEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id",updatable = false,unique = true)

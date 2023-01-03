@@ -1,7 +1,7 @@
 package ru.practicum.shareit.item.model;
 
 import lombok.*;
-import ru.practicum.shareit.booking.dto.BookingShortDto;
+import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
@@ -13,7 +13,6 @@ import java.util.Set;
 @NoArgsConstructor
 @Builder
 public class Item {
-
     private Long id;
 
     private String name;
@@ -26,8 +25,8 @@ public class Item {
 
     private Set<CommentEntity> comments;
 
-    private BookingShortDto lastBooking;
+    private BookingEntity lastBooking;
 
-    private BookingShortDto nextBooking;
+    private BookingEntity nextBooking;
 
 }

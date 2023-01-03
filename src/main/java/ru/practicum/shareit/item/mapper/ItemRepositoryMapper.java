@@ -17,8 +17,6 @@ import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
         UserRepositoryMapper.class
 })
 public interface ItemRepositoryMapper {
-
-
     Item toItem(ItemEntity entity);
 
 

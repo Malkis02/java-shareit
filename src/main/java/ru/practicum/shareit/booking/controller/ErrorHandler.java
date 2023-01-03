@@ -10,7 +10,6 @@ import ru.practicum.shareit.exception.*;
 @Slf4j
 @RestControllerAdvice("ru.practicum.shareit")
 public class ErrorHandler {
-
     @ExceptionHandler
     public ResponseEntity<String> handleIllegalTimeException(final IllegalTimeException e) {
         log.info("400 {}", e.getMessage());

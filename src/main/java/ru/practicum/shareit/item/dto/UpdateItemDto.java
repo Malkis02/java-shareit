@@ -9,7 +9,6 @@ import ru.practicum.shareit.user.dto.UserDto;
 @Getter
 @AllArgsConstructor
 public class UpdateItemDto {
-
     private Long id;
 
     private String name;
