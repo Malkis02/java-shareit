@@ -1,12 +1,9 @@
 package ru.practicum.shareit.exception;
 
 
-public class NotFoundException extends RuntimeException {
-    public NotFoundException(String s) {
+public class IllegalTimeException extends RuntimeException {
+    public IllegalTimeException(String s) {
         super(s);
-    }
-
-    public NotFoundException() {
     }
 
     public String getMessage() {

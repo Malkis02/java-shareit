@@ -1,38 +1,17 @@
 package ru.practicum.shareit.user.service;
 
-import org.springframework.stereotype.Service;
-import ru.practicum.shareit.user.model.User;
-import ru.practicum.shareit.user.repository.UserRepository;
+import ru.practicum.shareit.user.entity.UserEntity;
 
 import java.util.List;
 
-@Service
-public class UserService {
-    private final UserRepository userRepository;
+public interface UserService {
+    UserEntity create(UserEntity user);
 
-    public UserService(UserRepository userRepository) {
-        this.userRepository = userRepository;
-    }
+    UserEntity update(UserEntity user, Long userId);
 
-    public User create(User user) {
-        return userRepository.create(user);
-    }
+    void delete(Long userId);
 
-    public User update(User user, Long userid) {
-        userRepository.update(user, userid);
-        user.setId(userid);
-        return user;
-    }
+    UserEntity get(Long userId);
 
-    public void delete(Long userId) {
-        userRepository.delete(userId);
-    }
-
-    public User get(Long userId) {
-        return userRepository.get(userId);
-    }
-
-    public List<User> getAll() {
-        return userRepository.getAll();
-    }
+    List<UserEntity> getAll();
 }
