@@ -34,8 +34,10 @@ public class ItemEntity {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CommentEntity> comments;
 
-    transient private BookingEntity lastBooking;
+    @Transient
+    private BookingEntity lastBooking;
 
-    transient private BookingEntity nextBooking;
+    @Transient
+    private BookingEntity nextBooking;
 
 }
