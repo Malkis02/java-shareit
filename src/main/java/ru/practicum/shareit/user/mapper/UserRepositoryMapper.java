@@ -17,7 +17,7 @@ public interface UserRepositoryMapper {
 
     UserEntity mapToUserEntity(UpdateUserDto userDto);
 
-    @Mapping(target = "id",ignore = true)
-    @Mapping(target = "name",source = "name")
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "name", source = "name")
     void updateEntity(UserEntity user, @MappingTarget UserEntity entity);
 }

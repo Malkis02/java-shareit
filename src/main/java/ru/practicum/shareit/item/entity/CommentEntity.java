@@ -14,14 +14,14 @@ import java.sql.Timestamp;
 public class CommentEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", updatable = false, unique = true,nullable = false)
+    @Column(name = "id", updatable = false, unique = true, nullable = false)
     private Long id;
 
     @Column(name = "text")
     private String text;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id",nullable = false)
+    @JoinColumn(name = "item_id", nullable = false)
     private ItemEntity item;
 
     @ManyToOne(fetch = FetchType.LAZY)

@@ -1,6 +1,8 @@
 package ru.practicum.shareit.booking.mapper;
 
-import org.mapstruct.*;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.shareit.booking.dto.BookingCreateRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
@@ -16,10 +18,10 @@ import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
         },
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface BookingRepositoryMapper {
-    @Mapping(target = "id",source = "id")
-    @Mapping(target = "booker.id",source = "bookerId")
-    @Mapping(target = "start",source = "start")
-    @Mapping(target = "end",source = "end")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "booker.id", source = "bookerId")
+    @Mapping(target = "start", source = "start")
+    @Mapping(target = "end", source = "end")
     BookingEntity mapToEntity(BookingShortDto bookingShortDto);
 
     @Mapping(target = "booker.id", source = "booker.id")
@@ -37,7 +39,7 @@ public interface BookingRepositoryMapper {
     @Mapping(target = "end", source = "end")
     BookingDto toBookingDto(BookingEntity booking);
 
-    @Mapping(target = "id",source = "id")
-    @Mapping(target = "bookerId",source = "booker.id")
+    @Mapping(target = "id", source = "id")
+    @Mapping(target = "bookerId", source = "booker.id")
     BookingShortDto toLastBookingDto(BookingEntity booking);
 }

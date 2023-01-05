@@ -2,7 +2,6 @@ package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import ru.practicum.shareit.booking.dto.BookingShortDto;
@@ -15,7 +14,6 @@ import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.ItemEntity;
-import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.CommentRepositoryMapper;
 import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.model.Comment;
@@ -26,7 +24,10 @@ import ru.practicum.shareit.user.service.UserService;
 
 import java.sql.Timestamp;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -48,9 +49,9 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemEntity create(ItemEntity item,Long userId) {
+    public ItemEntity create(ItemEntity item, Long userId) {
         UserEntity user = userService.get(userId);
-            return itemRepository.save(item);
+        return itemRepository.save(item);
     }
 
     @Override
@@ -58,12 +59,12 @@ public class ItemServiceImpl implements ItemService {
     public ItemEntity update(ItemEntity item, Long itemId) {
         validate(itemId, item);
         ItemEntity stored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
-        mapper.updateEntity(item,stored);
+        mapper.updateEntity(item, stored);
         return itemRepository.save(stored);
     }
 
     @Override
-    public ItemBookingDto get(Long itemId,Long userId) {
+    public ItemBookingDto get(Long itemId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
         ItemBookingDto itemBookingDto = mapper.toItemBookingDto(itemStored);
@@ -100,7 +101,7 @@ public class ItemServiceImpl implements ItemService {
         LocalDateTime now = LocalDateTime.now();
         List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId);
         List<ItemBookingDto> itemList = new ArrayList<>();
-        for (ItemEntity item:stored) {
+        for (ItemEntity item : stored) {
             if (item.getOwner().getId().equals(userId)) {
                 List<BookingEntity> bookingList = bookingRepository.findAllByItem(item);
                 ItemBookingDto itemBookingDto = mapper.toItemBookingDto(item);
@@ -124,18 +125,18 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public Comment createComment(Comment comment,Long itemId,Long userId) {
+    public Comment createComment(Comment comment, Long itemId, Long userId) {
         UserEntity user = userService.get(userId);
         if (comment.getText().isEmpty() || comment.getText().isBlank()) {
             throw new ItemNotAvailableException();
         }
         if (!bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
-                itemId,userId, BookingStatus.APPROVED,LocalDateTime.now())) {
-                throw new ItemNotAvailableException();
+                itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())) {
+            throw new ItemNotAvailableException();
         }
         comment.setCreated(Timestamp.valueOf(LocalDateTime.now()));
-        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment,user,itemId);
-        return commentRepositoryMapper.toComment(commentRepository.save(commentEntity),user,itemId);
+        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment, user, itemId);
+        return commentRepositoryMapper.toComment(commentRepository.save(commentEntity), user, itemId);
     }
 
     public List<ItemEntity> search(String text) {

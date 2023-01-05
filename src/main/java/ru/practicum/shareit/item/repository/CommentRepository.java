@@ -6,6 +6,6 @@ import ru.practicum.shareit.item.entity.ItemEntity;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<CommentEntity,Long> {
+public interface CommentRepository extends JpaRepository<CommentEntity, Long> {
     List<CommentEntity> findAllByItem(ItemEntity item);
 }

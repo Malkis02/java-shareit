@@ -31,6 +31,6 @@ public interface ItemRepositoryMapper {
     @Mapping(target = "owner.id", source = "userId")
     ItemEntity mapToItem(UpdateItemDto itemDto, Long userId);
 
-    @Mapping(target = "id",ignore = true)
+    @Mapping(target = "id", ignore = true)
     void updateEntity(ItemEntity item, @MappingTarget ItemEntity entity);
 }

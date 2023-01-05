@@ -34,7 +34,7 @@ public class UserController {
     public ResponseEntity<UserDto> updateUser(@Min(1L) @PathVariable Long userId,
                                               @RequestBody UpdateUserDto user) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapper.toUserDto(userService.update(mapper.mapToUserEntity(user),userId)));
+                .body(mapper.toUserDto(userService.update(mapper.mapToUserEntity(user), userId)));
     }
 
     @GetMapping("{userId}")

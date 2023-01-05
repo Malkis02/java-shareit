@@ -10,7 +10,6 @@ import ru.practicum.shareit.booking.dto.BookingUpdateResponseDto;
 import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
-import ru.practicum.shareit.exception.UnsupportedStateException;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;

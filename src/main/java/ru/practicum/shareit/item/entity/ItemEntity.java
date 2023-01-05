@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.entity;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.Setter;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
@@ -14,7 +15,7 @@ import java.util.Set;
 public class ItemEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id",updatable = false,unique = true)
+    @Column(name = "id", updatable = false, unique = true)
     private Long id;
 
     @Column(name = "name", nullable = false, length = 255)

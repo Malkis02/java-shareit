@@ -2,7 +2,6 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.model.BookingState;
@@ -34,22 +33,22 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional
-    public BookingEntity create(BookingEntity booking,Long userId,Long itemId) {
+    public BookingEntity create(BookingEntity booking, Long userId, Long itemId) {
         UserEntity user = userService.get(userId);
         ItemEntity item = itemService.getItem(itemId);
         validation(booking);
         if (!item.getAvailable()) {
             throw new ItemNotAvailableException();
         }
-        if (Objects.equals(userId,item.getOwner().getId())) {
+        if (Objects.equals(userId, item.getOwner().getId())) {
             throw new NotFoundException("Нельзя брать в аренду у самого себя");
         }
         if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())) {
             List<BookingEntity> bookings = repository.findAllByItem(item);
-            for (BookingEntity b:bookings){
+            for (BookingEntity b : bookings) {
                 if (booking.getStart().isAfter(b.getStart())
-                        && booking.getEnd().isBefore(b.getEnd())){
-                            throw new NotFoundException("Вещь занята на это время");
+                        && booking.getEnd().isBefore(b.getEnd())) {
+                    throw new NotFoundException("Вещь занята на это время");
                 }
             }
         }
@@ -60,18 +59,18 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    public BookingEntity get(Long bookingId,Long userId) {
+    public BookingEntity get(Long bookingId, Long userId) {
         BookingEntity booking = repository.findById(bookingId)
                 .orElseThrow(NotFoundException::new);
-        if (Objects.equals(userId,booking.getItem().getOwner().getId())
-                || Objects.equals(userId,booking.getBooker().getId())) {
+        if (Objects.equals(userId, booking.getItem().getOwner().getId())
+                || Objects.equals(userId, booking.getBooker().getId())) {
             return booking;
         }
         throw new NotFoundException("Аренда не найдена");
     }
 
     @Override
-    public List<BookingEntity> getAll(Long userId,BookingState state) {
+    public List<BookingEntity> getAll(Long userId, BookingState state) {
         List<BookingEntity> result;
         UserEntity booker = userService.get(userId);
         switch (state) {
@@ -88,10 +87,10 @@ public class BookingServiceImpl implements BookingService {
                 result = repository.findFutureByBooker(booker, LocalDateTime.now());
                 break;
             case WAITING:
-                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker,BookingStatus.WAITING);
+                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker,BookingStatus.REJECTED);
+                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.REJECTED);
                 break;
             case UNSUPPORTED_STATUS:
             default:
@@ -118,10 +117,10 @@ public class BookingServiceImpl implements BookingService {
                 result = repository.findFutureByOwnerItems(owner, LocalDateTime.now());
                 break;
             case WAITING:
-                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner,BookingStatus.WAITING);
+                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.WAITING);
                 break;
             case REJECTED:
-                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner,BookingStatus.REJECTED);
+                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.REJECTED);
                 break;
             case UNSUPPORTED_STATUS:
             default:
@@ -135,14 +134,14 @@ public class BookingServiceImpl implements BookingService {
     public BookingEntity approve(Long bookingId, Long userId, Boolean approved) {
         BookingEntity stored = repository.findById(bookingId)
                 .orElseThrow(NotFoundException::new);
-        if (!Objects.equals(userId,stored.getItem().getOwner().getId())) {
+        if (!Objects.equals(userId, stored.getItem().getOwner().getId())) {
             throw new NotFoundException();
         }
-        if (!Objects.equals(BookingStatus.WAITING,stored.getStatus())) {
+        if (!Objects.equals(BookingStatus.WAITING, stored.getStatus())) {
             throw new UnsupportedStatusException();
         }
         stored.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-            return repository.save(stored);
+        return repository.save(stored);
 
     }
 

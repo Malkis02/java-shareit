@@ -11,6 +11,7 @@ import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.service.ItemService;
+
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
 import java.util.ArrayList;
@@ -30,23 +31,23 @@ public class ItemController {
 
     @PostMapping
     public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                  @Valid @RequestBody ItemDto item) {
+                                              @Valid @RequestBody ItemDto item) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mapper.mapToItemDto(itemService.create(mapper.mapToItem(item,userId),userId)));
+                .body(mapper.mapToItemDto(itemService.create(mapper.mapToItem(item, userId), userId)));
     }
 
     @PatchMapping("/{itemId}")
     public ResponseEntity<ItemDto> updateItem(@Min(1L) @PathVariable Long itemId,
-                                                      @RequestHeader("X-Sharer-User-Id") Long userId,
-                                                      @Valid @RequestBody UpdateItemDto item) {
+                                              @RequestHeader("X-Sharer-User-Id") Long userId,
+                                              @Valid @RequestBody UpdateItemDto item) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapper.mapToItemDto(itemService.update(mapper.mapToItem(item,userId),itemId)));
+                .body(mapper.mapToItemDto(itemService.update(mapper.mapToItem(item, userId), itemId)));
     }
 
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemBookingDto> getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
-            @Min(1L) @PathVariable Long itemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.get(itemId,userId));
+                                                  @Min(1L) @PathVariable Long itemId) {
+        return ResponseEntity.status(HttpStatus.OK).body(itemService.get(itemId, userId));
     }
 
     @GetMapping
@@ -66,10 +67,10 @@ public class ItemController {
 
     @PostMapping("/{itemId}/comment")
     public ResponseEntity<CommentDto> createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @RequestBody CommentDto comment,
-                                                 @PathVariable Long itemId) {
+                                                    @RequestBody CommentDto comment,
+                                                    @PathVariable Long itemId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(commentMapper.toCommentDto(
-                        itemService.createComment(commentMapper.toComment(comment),itemId,userId)));
+                        itemService.createComment(commentMapper.toComment(comment), itemId, userId)));
     }
 }
