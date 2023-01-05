@@ -8,7 +8,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
@@ -16,15 +16,15 @@ public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
 
     @Query("select b from BookingEntity b " +
             "where b.booker = :booker and :now between b.start and b.end order by b.start desc ")
-    List<BookingEntity> findCurrentByBooker(@Param("booker") UserEntity booker, @Param("now") Timestamp now);
+    List<BookingEntity> findCurrentByBooker(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now);
 
     @Query("select b from BookingEntity b " +
             "where b.booker = :booker and b.end < :now order by b.start desc ")
-    List<BookingEntity> findPastByBooker(@Param("booker")UserEntity booker,@Param("now") Timestamp now);
+    List<BookingEntity> findPastByBooker(@Param("booker")UserEntity booker,@Param("now") LocalDateTime now);
 
     @Query("select b from BookingEntity b " +
             "where b.booker = :booker and b.start > :now order by b.start desc ")
-    List<BookingEntity> findFutureByBooker(@Param("booker")UserEntity booker,@Param("now") Timestamp now);
+    List<BookingEntity> findFutureByBooker(@Param("booker")UserEntity booker,@Param("now") LocalDateTime now);
 
     List<BookingEntity> findAllByBookerAndStatusOrderByStartDesc(
             @Param("booker")UserEntity booker,
@@ -42,17 +42,15 @@ public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner and :now between b.start and b.end order by b.start desc ")
-    List<BookingEntity> findCurrentByOwnerItems(@Param("owner") UserEntity owner,@Param("now") Timestamp now);
+    List<BookingEntity> findCurrentByOwnerItems(@Param("owner") UserEntity owner,@Param("now") LocalDateTime now);
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner and b.end < :now order by b.start desc ")
-    List<BookingEntity> findPastByOwnerItems(@Param("owner") UserEntity owner,@Param("now") Timestamp now);
+    List<BookingEntity> findPastByOwnerItems(@Param("owner") UserEntity owner,@Param("now") LocalDateTime now);
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner and b.start > :now order by b.start desc")
-    List<BookingEntity> findFutureByOwnerItems(@Param("owner") UserEntity owner, @Param("now") Timestamp now);
-
-
+    List<BookingEntity> findFutureByOwnerItems(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now);
 
     List<BookingEntity> findAllByItem(ItemEntity item);
 
@@ -60,5 +58,5 @@ public interface BookingRepository extends JpaRepository<BookingEntity,Long> {
             Long itemId,
             Long bookerId,
             BookingStatus status,
-            Timestamp end);
+            LocalDateTime end);
 }

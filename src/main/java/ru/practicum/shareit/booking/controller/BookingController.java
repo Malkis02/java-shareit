@@ -7,7 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.booking.dto.BookingCreateRequestDto;
 import ru.practicum.shareit.booking.dto.BookingDto;
 import ru.practicum.shareit.booking.dto.BookingUpdateResponseDto;
-import ru.practicum.shareit.booking.mapper.BookingMapper;
+import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 import ru.practicum.shareit.exception.UnsupportedStateException;
@@ -24,21 +24,21 @@ import java.util.stream.Collectors;
 public class BookingController {
     private final BookingService bookingService;
 
-    private final BookingMapper mapper;
+    private final BookingRepositoryMapper bookingMapper;
 
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @Valid @RequestBody BookingCreateRequestDto booking) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mapper.toBookingDto(bookingService
-                        .create(mapper.toBooking(booking), userId, booking.getItemId())));
+                .body(bookingMapper.toBookingDto(bookingService
+                        .create(bookingMapper.toBookingEntity(booking), userId, booking.getItemId())));
     }
 
     @GetMapping("/{bookingId}")
     public ResponseEntity<BookingDto> getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                  @Min(1L) @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapper.toBookingDto(bookingService.get(bookingId, userId)));
+                .body(bookingMapper.toBookingDto(bookingService.get(bookingId, userId)));
     }
 
     @PatchMapping("/{bookingId}")
@@ -46,26 +46,26 @@ public class BookingController {
                                                            @RequestHeader("X-Sharer-User-Id") Long userId,
                                                            @Min(1L) @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(mapper.toBookingUpdateResponseDto(bookingService.approve(bookingId, userId, approved)));
+                .body(bookingMapper.toBookingUpdateResponseDto(bookingService.approve(bookingId, userId, approved)));
     }
 
     @GetMapping
     public ResponseEntity<List<BookingDto>> getAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL", required = false) BookingState state) throws UnsupportedStateException {
+            @RequestParam(defaultValue = "ALL", required = false) BookingState state) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingService.getAll(userId, state).stream()
-                        .map(mapper::toBookingDto)
+                        .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList()));
     }
 
     @GetMapping("/owner")
     public ResponseEntity<List<BookingDto>> getOwnerItemsAll(
             @RequestParam(defaultValue = "ALL", required = false) BookingState state,
-            @RequestHeader("X-Sharer-User-Id") Long userId) throws UnsupportedStateException {
+            @RequestHeader("X-Sharer-User-Id") Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingService.getAllOwnerItems(userId, state).stream()
-                        .map(mapper::toBookingDto)
+                        .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList()));
     }
 

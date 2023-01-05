@@ -3,6 +3,7 @@ package ru.practicum.shareit.user.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.user.entity.UserEntity;
@@ -15,12 +16,14 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
 
     private final UserRepositoryMapper mapper;
 
     @Override
+    @Transactional
     public UserEntity create(UserEntity user) {
         return userRepository.save(user);
     }
@@ -40,14 +43,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserEntity get(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(NotFoundException::new);
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UserEntity> getAll() {
         return new ArrayList<>(userRepository.findAll());
     }

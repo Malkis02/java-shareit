@@ -5,11 +5,11 @@ import org.mapstruct.Mapping;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.model.Comment;
-import ru.practicum.shareit.user.mapper.UserMapper;
+import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
 
 @Mapper(componentModel = "spring",uses = {
-        ItemMapper.class,
-        UserMapper.class
+        ItemRepositoryMapper.class,
+        UserRepositoryMapper.class
 })
 public interface CommentMapper {
     @Mapping(target = "id",source = "id")

@@ -2,29 +2,27 @@ package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.BookingEntity;
-import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
-import ru.practicum.shareit.booking.model.Booking;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.*;
-import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
-import ru.practicum.shareit.item.model.Item;
+import ru.practicum.shareit.item.entity.ItemEntity;
+import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.item.service.ItemService;
 import ru.practicum.shareit.user.entity.UserEntity;
-import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
 import ru.practicum.shareit.user.service.UserService;
 
-import java.sql.Timestamp;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     private final BookingRepository repository;
 
@@ -32,17 +30,13 @@ public class BookingServiceImpl implements BookingService {
 
     private final ItemService itemService;
 
-    private final BookingRepositoryMapper mapper;
-
-    private final UserRepositoryMapper userMapper;
-
-    private final ItemRepositoryMapper itemRepositoryMapper;
+    private final ItemRepository itemRepository;
 
     @Override
     @Transactional
-    public Booking create(Booking booking,Long userId,Long itemId) {
+    public BookingEntity create(BookingEntity booking,Long userId,Long itemId) {
         UserEntity user = userService.get(userId);
-        Item item = itemService.getItem(itemId);
+        ItemEntity item = itemService.getItem(itemId);
         validation(booking);
         if (!item.getAvailable()) {
             throw new ItemNotAvailableException();
@@ -51,22 +45,23 @@ public class BookingServiceImpl implements BookingService {
             throw new NotFoundException("Нельзя брать в аренду у самого себя");
         }
         if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())) {
-            if (Objects.equals(item.getLastBooking().getStart().toLocalDateTime(),booking.getStart()) ||
-                    Objects.equals(item.getLastBooking().getEnd().toLocalDateTime(),booking.getEnd())) {
-                throw new NotFoundException("Уже есть бронирование на это время");
+            List<BookingEntity> bookings = repository.findAllByItem(item);
+            for (BookingEntity b:bookings){
+                if (booking.getStart().isAfter(b.getStart())
+                        && booking.getEnd().isBefore(b.getEnd())){
+                            throw new NotFoundException("Вещь занята на это время");
+                }
             }
         }
-        booking.setItem(itemRepositoryMapper.toItemEntity(item));
+        booking.setItem(item);
         booking.setBooker(user);
         booking.setStatus(BookingStatus.WAITING);
-        return mapper.toBooking(repository.save(mapper.toEntity(booking)));
+        return repository.save(booking);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public Booking get(Long bookingId,Long userId) {
-        Booking booking = repository.findById(bookingId)
-                .map(mapper::toBooking)
+    public BookingEntity get(Long bookingId,Long userId) {
+        BookingEntity booking = repository.findById(bookingId)
                 .orElseThrow(NotFoundException::new);
         if (Objects.equals(userId,booking.getItem().getOwner().getId())
                 || Objects.equals(userId,booking.getBooker().getId())) {
@@ -76,8 +71,7 @@ public class BookingServiceImpl implements BookingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Booking> getAll(Long userId,BookingState state) throws UnsupportedStateException {
+    public List<BookingEntity> getAll(Long userId,BookingState state) {
         List<BookingEntity> result;
         UserEntity booker = userService.get(userId);
         switch (state) {
@@ -85,13 +79,13 @@ public class BookingServiceImpl implements BookingService {
                 result = repository.findAllByBookerOrderByStartDesc(booker);
                 break;
             case CURRENT:
-                result = repository.findCurrentByBooker(booker, Timestamp.valueOf(LocalDateTime.now()));
+                result = repository.findCurrentByBooker(booker, LocalDateTime.now());
                 break;
             case PAST:
-                result = repository.findPastByBooker(booker, Timestamp.valueOf(LocalDateTime.now()));
+                result = repository.findPastByBooker(booker, LocalDateTime.now());
                 break;
             case FUTURE:
-                result = repository.findFutureByBooker(booker, Timestamp.valueOf(LocalDateTime.now()));
+                result = repository.findFutureByBooker(booker, LocalDateTime.now());
                 break;
             case WAITING:
                 result = repository.findAllByBookerAndStatusOrderByStartDesc(booker,BookingStatus.WAITING);
@@ -103,14 +97,11 @@ public class BookingServiceImpl implements BookingService {
             default:
                 throw new UnsupportedStateException();
         }
-        return result.stream()
-                .map(mapper::toBooking)
-                .collect(Collectors.toList());
+        return new ArrayList<>(result);
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public List<Booking> getAllOwnerItems(Long userId, BookingState state) throws UnsupportedStateException {
+    public List<BookingEntity> getAllOwnerItems(Long userId, BookingState state) {
         List<BookingEntity> result;
         UserEntity owner = userService.get(userId);
         switch (state) {
@@ -118,13 +109,13 @@ public class BookingServiceImpl implements BookingService {
                 result = repository.findAllByOwnerItems(owner);
                 break;
             case CURRENT:
-                result = repository.findCurrentByOwnerItems(owner, Timestamp.valueOf(LocalDateTime.now()));
+                result = repository.findCurrentByOwnerItems(owner, LocalDateTime.now());
                 break;
             case PAST:
-                result = repository.findPastByOwnerItems(owner, Timestamp.valueOf(LocalDateTime.now()));
+                result = repository.findPastByOwnerItems(owner, LocalDateTime.now());
                 break;
             case FUTURE:
-                result = repository.findFutureByOwnerItems(owner, Timestamp.valueOf(LocalDateTime.now()));
+                result = repository.findFutureByOwnerItems(owner, LocalDateTime.now());
                 break;
             case WAITING:
                 result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner,BookingStatus.WAITING);
@@ -136,14 +127,12 @@ public class BookingServiceImpl implements BookingService {
             default:
                 throw new UnsupportedStateException();
         }
-        return result.stream()
-                .map(mapper::toBooking)
-                .collect(Collectors.toList());
+        return new ArrayList<>(result);
     }
 
     @Override
     @Transactional
-    public Booking approve(Long bookingId, Long userId, Boolean approved) {
+    public BookingEntity approve(Long bookingId, Long userId, Boolean approved) {
         BookingEntity stored = repository.findById(bookingId)
                 .orElseThrow(NotFoundException::new);
         if (!Objects.equals(userId,stored.getItem().getOwner().getId())) {
@@ -153,11 +142,11 @@ public class BookingServiceImpl implements BookingService {
             throw new UnsupportedStatusException();
         }
         stored.setStatus(approved ? BookingStatus.APPROVED : BookingStatus.REJECTED);
-            return mapper.toBooking(repository.save(stored));
+            return repository.save(stored);
 
     }
 
-    private void validation(Booking booking) {
+    private void validation(BookingEntity booking) {
         LocalDateTime end = booking.getEnd();
         LocalDateTime start = booking.getStart();
         if (end.isBefore(LocalDateTime.now()) || end.isBefore(start) || start.isBefore(LocalDateTime.now())) {

@@ -5,8 +5,10 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.NullValuePropertyMappingStrategy;
 import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
+import ru.practicum.shareit.item.dto.ItemBookingDto;
+import ru.practicum.shareit.item.dto.ItemDto;
+import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.entity.ItemEntity;
-import ru.practicum.shareit.item.model.Item;
 import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
 
 
@@ -14,14 +16,21 @@ import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, uses = {
         CommentRepositoryMapper.class,
         BookingRepositoryMapper.class,
-        UserRepositoryMapper.class
+        UserRepositoryMapper.class,
+        CommentMapper.class
 })
 public interface ItemRepositoryMapper {
-    Item toItem(ItemEntity entity);
+    @Mapping(target = "owner.id", source = "userId")
+    ItemEntity mapToItem(ItemDto itemDto, Long userId);
 
+    ItemDto mapToItemDto(ItemEntity item);
 
-    ItemEntity toItemEntity(Item item);
+    ItemBookingDto toItemBookingDto(ItemEntity item);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "owner.id", source = "userId")
+    ItemEntity mapToItem(UpdateItemDto itemDto, Long userId);
 
     @Mapping(target = "id",ignore = true)
-    void updateEntity(Item item, @MappingTarget ItemEntity entity);
+    void updateEntity(ItemEntity item, @MappingTarget ItemEntity entity);
 }

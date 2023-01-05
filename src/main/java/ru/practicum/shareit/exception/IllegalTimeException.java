@@ -6,4 +6,7 @@ public class IllegalTimeException extends RuntimeException {
         super(s);
     }
 
+    public String getMessage() {
+        return super.getMessage();
+    }
 }

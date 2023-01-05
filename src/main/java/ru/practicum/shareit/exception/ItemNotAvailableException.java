@@ -2,8 +2,8 @@ package ru.practicum.shareit.exception;
 
 
 public class ItemNotAvailableException extends RuntimeException {
-    public ItemNotAvailableException() {
 
+    public String getMessage() {
+        return super.getMessage();
     }
-
 }

@@ -8,4 +8,8 @@ public class NotFoundException extends RuntimeException {
 
     public NotFoundException() {
     }
+
+    public String getMessage() {
+        return super.getMessage();
+    }
 }

@@ -6,7 +6,7 @@ import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
 import javax.persistence.*;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,10 +19,10 @@ public class BookingEntity {
     private Long id;
 
     @Column(name = "start_date",nullable = false)
-    private Timestamp start;
+    private LocalDateTime start;
 
     @Column(name = "end_date",nullable = false)
-    private Timestamp end;
+    private LocalDateTime end;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "booker_id",nullable = false)

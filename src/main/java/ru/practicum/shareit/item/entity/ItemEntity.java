@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.entity;
 
 import lombok.*;
+import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.user.entity.UserEntity;
 
 import javax.persistence.*;
@@ -31,5 +32,9 @@ public class ItemEntity {
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<CommentEntity> comments;
+
+    transient private BookingEntity lastBooking;
+
+    transient private BookingEntity nextBooking;
 
 }

@@ -9,7 +9,7 @@ import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.mapper.CommentMapper;
-import ru.practicum.shareit.item.mapper.ItemMapper;
+import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.service.ItemService;
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 public class ItemController {
     private final ItemService itemService;
 
-    private final ItemMapper itemMapper;
+    private final ItemRepositoryMapper mapper;
 
     private final CommentMapper commentMapper;
 
@@ -32,7 +32,7 @@ public class ItemController {
     public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @Valid @RequestBody ItemDto item) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(itemMapper.mapToItemDto(itemService.create(itemMapper.mapToItem(item,userId),userId)));
+                .body(mapper.mapToItemDto(itemService.create(mapper.mapToItem(item,userId),userId)));
     }
 
     @PatchMapping("/{itemId}")
@@ -40,7 +40,7 @@ public class ItemController {
                                                       @RequestHeader("X-Sharer-User-Id") Long userId,
                                                       @Valid @RequestBody UpdateItemDto item) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemMapper.mapToItemDto(itemService.update(itemMapper.mapToItem(item,userId),itemId)));
+                .body(mapper.mapToItemDto(itemService.update(mapper.mapToItem(item,userId),itemId)));
     }
 
     @GetMapping("/{itemId}")
@@ -60,7 +60,7 @@ public class ItemController {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemService.search(text)
                         .stream()
-                        .map(itemMapper::mapToItemDto)
+                        .map(mapper::mapToItemDto)
                         .collect(Collectors.toList()));
     }
 
