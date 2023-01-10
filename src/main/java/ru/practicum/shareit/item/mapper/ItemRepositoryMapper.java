@@ -9,6 +9,7 @@ import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.dto.UpdateItemDto;
 import ru.practicum.shareit.item.entity.ItemEntity;
+import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
 
 
@@ -17,12 +18,15 @@ import ru.practicum.shareit.user.mapper.UserRepositoryMapper;
         CommentRepositoryMapper.class,
         BookingRepositoryMapper.class,
         UserRepositoryMapper.class,
-        CommentMapper.class
+        CommentMapper.class,
+        ItemRequestMapper.class
 })
 public interface ItemRepositoryMapper {
     @Mapping(target = "owner.id", source = "userId")
+    @Mapping(target = "request.id",source = "itemDto.requestId")
     ItemEntity mapToItem(ItemDto itemDto, Long userId);
 
+    @Mapping(target = "requestId",source = "item.request.id")
     ItemDto mapToItemDto(ItemEntity item);
 
     ItemBookingDto toItemBookingDto(ItemEntity item);

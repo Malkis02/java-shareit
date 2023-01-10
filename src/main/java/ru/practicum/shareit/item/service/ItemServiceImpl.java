@@ -48,7 +48,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
-    @Transactional
     public ItemEntity create(ItemEntity item, Long userId) {
         UserEntity user = userService.get(userId);
         return itemRepository.save(item);
