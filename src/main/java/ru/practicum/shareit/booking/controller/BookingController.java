@@ -57,7 +57,8 @@ public class BookingController {
             @Min(0)@RequestParam(defaultValue = "0") int from,
             @Min(1)@RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(bookingService.getAll(userId, state,from,size).stream()
+                .body(bookingService.getAll(userId, state,from,size)
+                        .stream()
                         .map(bookingMapper::toBookingDto)
                         .collect(Collectors.toList()));
     }

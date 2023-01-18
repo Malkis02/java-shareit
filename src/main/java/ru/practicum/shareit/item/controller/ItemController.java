@@ -14,7 +14,6 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -47,13 +46,16 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemBookingDto> getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @Min(1L) @PathVariable Long itemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.get(itemId, userId));
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.toItemBookingDto(itemService.get(itemId, userId)));
     }
 
     @GetMapping
     public ResponseEntity<List<ItemBookingDto>> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ArrayList<>(itemService.getAll(userId)));
+                .body(itemService.getAll(userId)
+                        .stream()
+                        .map(mapper::toItemBookingDto)
+                        .collect(Collectors.toList()));
     }
 
     @GetMapping("search")
