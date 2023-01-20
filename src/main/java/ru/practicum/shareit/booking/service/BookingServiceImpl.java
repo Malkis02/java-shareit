@@ -75,13 +75,13 @@ public class BookingServiceImpl implements BookingService {
                 result = repository.findAllByBookerOrderByStartDesc(booker, PageRequest.of((from / size), size));
                 break;
             case CURRENT:
-                result = repository.findCurrentByBooker(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
+                result = repository.findCurrentByBookerOrderByStartDesc(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case PAST:
-                result = repository.findPastByBooker(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
+                result = repository.findPastByBookerOrderByStartDesc(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case FUTURE:
-                result = repository.findFutureByBooker(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
+                result = repository.findFutureByBookerOrderByStartDesc(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case WAITING:
                 result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.WAITING, PageRequest.of((from / size), size));
@@ -102,16 +102,16 @@ public class BookingServiceImpl implements BookingService {
         UserEntity owner = userService.get(userId);
         switch (state) {
             case ALL:
-                result = repository.findAllByOwnerItems(owner, PageRequest.of((from / size), size));
+                result = repository.findAllByOwnerItemsOrderByStartDesc(owner, PageRequest.of((from / size), size));
                 break;
             case CURRENT:
-                result = repository.findCurrentByOwnerItems(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
+                result = repository.findCurrentByOwnerItemsOrderByStartDesc(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case PAST:
-                result = repository.findPastByOwnerItems(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
+                result = repository.findPastByOwnerItemsOrderByStartDesc(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case FUTURE:
-                result = repository.findFutureByOwnerItems(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
+                result = repository.findFutureByOwnerItemsOrderByStartDesc(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case WAITING:
                 result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.WAITING, PageRequest.of((from / size), size));

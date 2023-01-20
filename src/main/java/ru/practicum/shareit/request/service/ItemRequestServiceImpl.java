@@ -3,6 +3,7 @@ package ru.practicum.shareit.request.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.exception.NotFoundException;
 import ru.practicum.shareit.request.entity.ItemRequestEntity;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
@@ -14,6 +15,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class ItemRequestServiceImpl implements ItemRequestService {
 
     private final ItemRequestRepository repository;
@@ -21,6 +23,7 @@ public class ItemRequestServiceImpl implements ItemRequestService {
     private final UserService userService;
 
     @Override
+    @Transactional
     public ItemRequestEntity create(ItemRequestEntity entity, Long userId) {
         UserEntity user = userService.get(userId);
         entity.setCreated(LocalDateTime.now());

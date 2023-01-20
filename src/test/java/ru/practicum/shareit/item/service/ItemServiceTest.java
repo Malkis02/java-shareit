@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
+import org.springframework.data.domain.PageRequest;
 import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
@@ -189,15 +190,17 @@ public class ItemServiceTest {
         var itemEntity = new ItemEntity();
         var booking = new BookingEntity();
         booking.setStart(LocalDateTime.now());
+        int from = 0;
+        int size = 20;
         itemEntity.setOwner(user);
         itemEntity.setId(1L);
         itemEntity.setName("Дрель");
         itemEntity.setDescription("Аккумуляторная дрель");
         itemEntity.setAvailable(true);
-        when(repository.findAllByOwnerId(user.getId())).thenReturn(Collections.singletonList(itemEntity));
+        when(repository.findAllByOwnerId(user.getId(), PageRequest.of(from,size))).thenReturn(Collections.singletonList(itemEntity));
         when(bookingRepository.findAllByItem(itemEntity)).thenReturn(Collections.singletonList(booking));
 
-        var result = service.getAll(user.getId());
+        var result = service.getAll(user.getId(),from,size);
         assertNotNull(result);
         assertEquals(itemEntity.getId(), result.get(0).getId());
         assertEquals(itemEntity.getName(), result.get(0).getName());
@@ -317,15 +320,17 @@ public class ItemServiceTest {
     void search() {
         var user = new UserEntity(1L, "Вася", "vasya@yandex.ru");
         var itemEntity = new ItemEntity();
+        int from = 0;
+        int size = 20;
         String text = "Акк";
         itemEntity.setOwner(user);
         itemEntity.setId(1L);
         itemEntity.setName("Дрель");
         itemEntity.setDescription("Аккумуляторная дрель");
         when(repository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(
-                text,text)).thenReturn(Collections.singletonList(itemEntity));
+                text,text,PageRequest.of(from,size))).thenReturn(Collections.singletonList(itemEntity));
 
-        var result = service.search(text);
+        var result = service.search(text,from,size);
         assertNotNull(result);
         assertEquals(itemEntity.getId(), result.get(0).getId());
         assertEquals(itemEntity.getName(), result.get(0).getName());
@@ -337,15 +342,17 @@ public class ItemServiceTest {
     void searchWithEmptyText() {
         var user = new UserEntity(1L, "Вася", "vasya@yandex.ru");
         var itemEntity = new ItemEntity();
+        int from = 0;
+        int size = 20;
         String text = "";
         itemEntity.setOwner(user);
         itemEntity.setId(1L);
         itemEntity.setName("Дрель");
         itemEntity.setDescription("Аккумуляторная дрель");
         when(repository.findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(
-                text,text)).thenReturn(Collections.singletonList(itemEntity));
+                text,text,PageRequest.of(from,size))).thenReturn(Collections.singletonList(itemEntity));
 
-        var result = service.search(text);
+        var result = service.search(text,from,size);
         assertEquals(0,result.size());
     }
 }

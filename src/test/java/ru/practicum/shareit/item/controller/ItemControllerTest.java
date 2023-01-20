@@ -132,15 +132,19 @@ public class ItemControllerTest {
     @Test
     void getAll() throws Exception {
         var item = new ItemEntity();
+        int from = 0;
+        int size = 20;
         item.setId(ITEM_ID);
         item.setDescription("Аккумуляторная дрель");
         item.setName("Дрель");
         item.setAvailable(true);
-        when(service.getAll(USER_ID)).thenReturn(List.of(item));
+        when(service.getAll(USER_ID,from,size)).thenReturn(List.of(item));
 
         mockMvc.perform(MockMvcRequestBuilders.get(PATH)
                         .header("X-Sharer-User-Id",USER_ID)
                         .contentType(MediaType.APPLICATION_JSON)
+                        .param("from",String.valueOf(from))
+                        .param("size",String.valueOf(size))
                         .content(getContentFromFile("item/request/all.json"))
                 )
                 .andExpect(MockMvcResultMatchers.status().isOk())
@@ -182,15 +186,19 @@ public class ItemControllerTest {
     void search() throws Exception {
         String text = "Акк";
         var item = new ItemEntity();
+        int from = 0;
+        int size = 20;
         item.setId(ITEM_ID);
         item.setDescription("Аккумуляторная дрель");
         item.setName("Дрель");
         item.setAvailable(true);
-        when(service.search(text)).thenReturn(Collections.singletonList(item));
+        when(service.search(text,from,size)).thenReturn(Collections.singletonList(item));
 
         mockMvc.perform(MockMvcRequestBuilders.get(PATH_FOR_SEARCH)
                         .header("X-Sharer-User-Id",USER_ID)
                         .param("text",text)
+                        .param("from",String.valueOf(from))
+                        .param("size",String.valueOf(size))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(getContentFromFile("item/request/all.json"))
                 )

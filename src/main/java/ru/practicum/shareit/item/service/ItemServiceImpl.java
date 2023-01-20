@@ -1,6 +1,7 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -61,19 +62,17 @@ public class ItemServiceImpl implements ItemService {
     public ItemEntity get(Long itemId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
+        List<BookingEntity> bookings = bookingRepository.findAllByItem(itemStored);
         if (itemStored.getOwner().getId().equals(userId)) {
-            BookingEntity lastBooking =
-                    bookingRepository.findAllByItem(
-                                    itemStored)
+            BookingEntity lastBooking = bookings
                             .stream()
                             .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                            .max(Comparator.comparing(BookingEntity::getStart))
+                            .min(Comparator.comparing(BookingEntity::getStart))
                             .orElse(null);
-            BookingEntity nextBooking = bookingRepository.findAllByItem(
-                            itemStored)
+            BookingEntity nextBooking = bookings
                     .stream()
                     .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
-                    .max(Comparator.comparing(BookingEntity::getStart))
+                    .min(Comparator.comparing(BookingEntity::getStart))
                     .orElse(null);
             itemStored.setLastBooking(lastBooking);
             itemStored.setNextBooking(nextBooking);
@@ -88,9 +87,9 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemEntity> getAll(Long userId) {
+    public List<ItemEntity> getAll(Long userId, int from, int size) {
         LocalDateTime now = LocalDateTime.now();
-        List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId);
+        List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId, PageRequest.of((from / size), size));
         List<ItemEntity> itemList = new ArrayList<>();
         for (ItemEntity item : stored) {
             if (item.getOwner().getId().equals(userId)) {
@@ -98,12 +97,12 @@ public class ItemServiceImpl implements ItemService {
                 item.setLastBooking(bookingList
                         .stream()
                         .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                        .max(Comparator.comparing(BookingEntity::getStart))
+                        .min(Comparator.comparing(BookingEntity::getStart))
                         .orElse(null));
                 item.setNextBooking(bookingList
                         .stream()
                         .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
-                        .max(Comparator.comparing(BookingEntity::getStart))
+                        .min(Comparator.comparing(BookingEntity::getStart))
                         .orElse(null));
                 itemList.add(item);
             }
@@ -128,12 +127,14 @@ public class ItemServiceImpl implements ItemService {
         return commentRepositoryMapper.toComment(commentRepository.save(commentEntity), user, item);
     }
 
-    public List<ItemEntity> search(String text) {
+    @Override
+    public List<ItemEntity> search(String text, int from, int size) {
         if (!StringUtils.hasText(text)) {
             return Collections.emptyList();
         }
         return new ArrayList<>(itemRepository
-                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text));
+                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(
+                        text, text, PageRequest.of((from / size), size)));
     }
 
     private void validate(Long itemId, ItemEntity item) {

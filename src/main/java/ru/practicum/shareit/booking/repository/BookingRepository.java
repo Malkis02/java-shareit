@@ -18,17 +18,17 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 
     @Query("select b from BookingEntity b " +
             "where b.booker = :booker and :now between b.start and b.end order by b.start desc ")
-    List<BookingEntity> findCurrentByBooker(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now,
+    List<BookingEntity> findCurrentByBookerOrderByStartDesc(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now,
                                             Pageable pageable);
 
     @Query("select b from BookingEntity b " +
             "where b.booker = :booker and b.end < :now order by b.start desc ")
-    List<BookingEntity> findPastByBooker(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now,
+    List<BookingEntity> findPastByBookerOrderByStartDesc(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now,
                                          Pageable pageable);
 
     @Query("select b from BookingEntity b " +
             "where b.booker = :booker and b.start > :now order by b.start desc ")
-    List<BookingEntity> findFutureByBooker(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now,
+    List<BookingEntity> findFutureByBookerOrderByStartDesc(@Param("booker") UserEntity booker, @Param("now") LocalDateTime now,
                                            Pageable pageable);
 
     List<BookingEntity> findAllByBookerAndStatusOrderByStartDesc(
@@ -45,22 +45,22 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner order by b.start desc ")
-    List<BookingEntity> findAllByOwnerItems(@Param("owner") UserEntity owner,
+    List<BookingEntity> findAllByOwnerItemsOrderByStartDesc(@Param("owner") UserEntity owner,
                                             Pageable pageable);
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner and :now between b.start and b.end order by b.start desc ")
-    List<BookingEntity> findCurrentByOwnerItems(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now,
+    List<BookingEntity> findCurrentByOwnerItemsOrderByStartDesc(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now,
                                                 Pageable pageable);
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner and b.end < :now order by b.start desc ")
-    List<BookingEntity> findPastByOwnerItems(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now,
+    List<BookingEntity> findPastByOwnerItemsOrderByStartDesc(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now,
                                              Pageable pageable);
 
     @Query("select b from BookingEntity b " +
             "where b.item.owner = :owner and b.start > :now order by b.start desc")
-    List<BookingEntity> findFutureByOwnerItems(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now,
+    List<BookingEntity> findFutureByOwnerItemsOrderByStartDesc(@Param("owner") UserEntity owner, @Param("now") LocalDateTime now,
                                                Pageable pageable);
 
     List<BookingEntity> findAllByItem(ItemEntity item);

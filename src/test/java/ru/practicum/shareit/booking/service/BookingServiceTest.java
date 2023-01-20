@@ -362,7 +362,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(start);
         booking.setEnd(end);
-        when(repository.findCurrentByBooker(any(),any(),any())).thenReturn(Collections.singletonList(booking));
+        when(repository.findCurrentByBookerOrderByStartDesc(any(),any(),any())).thenReturn(Collections.singletonList(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findById(booker.getId())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
@@ -398,7 +398,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().minusDays(2));
         booking.setEnd(LocalDateTime.now().minusDays(1));
-        when(repository.findPastByBooker(any(),any(), any())).thenReturn(Collections.singletonList(booking));
+        when(repository.findPastByBookerOrderByStartDesc(any(),any(), any())).thenReturn(Collections.singletonList(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findById(booker.getId())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
@@ -433,8 +433,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(10));
         booking.setEnd(LocalDateTime.now().plusDays(20));
-        when(repository.findFutureByBooker(any(),any(), any()))
-                .thenReturn(List.of(booking));
+        when(repository.findFutureByBookerOrderByStartDesc(any(),any(), any())).thenReturn(List.of(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findById(booker.getId())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
@@ -543,7 +542,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(10));
         booking.setEnd(LocalDateTime.now().plusDays(20));
-        when(repository.findFutureByBooker(booker,LocalDateTime.now(), PageRequest.of(from,size)))
+        when(repository.findFutureByBookerOrderByStartDesc(booker,LocalDateTime.now(), PageRequest.of(from,size)))
                 .thenReturn(Collections.singletonList(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findById(booker.getId())).thenReturn(Optional.of(booker));
@@ -575,7 +574,8 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(1));
         booking.setEnd(LocalDateTime.now().plusDays(2));
-        when(repository.findAllByOwnerItems(user, PageRequest.of(from,size))).thenReturn(Collections.singletonList(booking));
+        when(repository.findAllByOwnerItemsOrderByStartDesc(user, PageRequest.of(from,size)))
+                .thenReturn(Collections.singletonList(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
 
@@ -607,7 +607,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(1));
         booking.setEnd(LocalDateTime.now().plusDays(2));
-        when(repository.findCurrentByOwnerItems(any(),any(),any())).thenReturn(List.of(booking));
+        when(repository.findCurrentByOwnerItemsOrderByStartDesc(any(),any(),any())).thenReturn(List.of(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findById(booker.getId())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
@@ -642,7 +642,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(1));
         booking.setEnd(LocalDateTime.now().plusDays(2));
-        when(repository.findPastByOwnerItems(any(),any(), any())).thenReturn(List.of(booking));
+        when(repository.findPastByOwnerItemsOrderByStartDesc(any(),any(), any())).thenReturn(List.of(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));
 
@@ -675,7 +675,7 @@ public class BookingServiceTest {
         booking.setItem(item);
         booking.setStart(LocalDateTime.now().plusDays(1));
         booking.setEnd(LocalDateTime.now().plusDays(2));
-        when(repository.findFutureByOwnerItems(any(),any(), any())).thenReturn(List.of(booking));
+        when(repository.findFutureByOwnerItemsOrderByStartDesc(any(),any(), any())).thenReturn(List.of(booking));
         when(userRepository.findById(user.getId())).thenReturn(Optional.of(user));
         when(userRepository.findById(booker.getId())).thenReturn(Optional.of(booker));
         when(itemRepository.findById(item.getId())).thenReturn(Optional.of(item));

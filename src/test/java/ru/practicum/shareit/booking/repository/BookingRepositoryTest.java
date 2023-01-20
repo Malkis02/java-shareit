@@ -61,7 +61,7 @@ public class BookingRepositoryTest {
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
         var now = LocalDateTime.now();
 
-        var result = repository.findCurrentByBooker(booker,now, Pageable.unpaged());
+        var result = repository.findCurrentByBookerOrderByStartDesc(booker,now, Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
@@ -75,7 +75,7 @@ public class BookingRepositoryTest {
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
         var now = LocalDateTime.now();
 
-        var result = repository.findPastByBooker(booker,now, Pageable.unpaged());
+        var result = repository.findPastByBookerOrderByStartDesc(booker,now, Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
@@ -89,7 +89,7 @@ public class BookingRepositoryTest {
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
         var now = LocalDateTime.now();
 
-        var result = repository.findFutureByBooker(booker,now, Pageable.unpaged());
+        var result = repository.findFutureByBookerOrderByStartDesc(booker,now, Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
@@ -128,7 +128,7 @@ public class BookingRepositoryTest {
         var end = LocalDateTime.now().plusDays(1);
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
 
-        var result = repository.findAllByOwnerItems(item.getOwner(), Pageable.unpaged());
+        var result = repository.findAllByOwnerItemsOrderByStartDesc(item.getOwner(), Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
@@ -142,7 +142,7 @@ public class BookingRepositoryTest {
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
         var now = LocalDateTime.now();
 
-        var result = repository.findCurrentByOwnerItems(item.getOwner(),now, Pageable.unpaged());
+        var result = repository.findCurrentByOwnerItemsOrderByStartDesc(item.getOwner(),now, Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
@@ -156,7 +156,7 @@ public class BookingRepositoryTest {
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
         var now = LocalDateTime.now();
 
-        var result = repository.findPastByOwnerItems(item.getOwner(),now, Pageable.unpaged());
+        var result = repository.findPastByOwnerItemsOrderByStartDesc(item.getOwner(),now, Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
@@ -170,7 +170,7 @@ public class BookingRepositoryTest {
         var booking = createBooking(start,end,item,booker,BookingStatus.APPROVED);
         var now = LocalDateTime.now();
 
-        var result = repository.findFutureByOwnerItems(item.getOwner(),now, Pageable.unpaged());
+        var result = repository.findFutureByOwnerItemsOrderByStartDesc(item.getOwner(),now, Pageable.unpaged());
         assertNotNull(result);
         assertEquals(1,result.size());
         assertEquals(booking.getId(),result.get(0).getId());
