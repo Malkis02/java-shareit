@@ -67,7 +67,7 @@ public class ItemServiceImpl implements ItemService {
             BookingEntity lastBooking = bookings
                             .stream()
                             .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                            .min(Comparator.comparing(BookingEntity::getStart))
+                            .max(Comparator.comparing(BookingEntity::getStart))
                             .orElse(null);
             BookingEntity nextBooking = bookings
                     .stream()

@@ -46,6 +46,9 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())) {
             List<BookingEntity> bookings = repository.findAllByItem(item);
             for (BookingEntity b : bookings) {
+                if (!booking.getStart().isBefore(b.getEnd()) || !booking.getEnd().isAfter(b.getStart())) {
+                    continue;
+                }
                 if (booking.getStart().isAfter(b.getStart()) && booking.getEnd().isBefore(b.getEnd())) {
                     throw new NotFoundException("Вещь занята на это время");
                 }
