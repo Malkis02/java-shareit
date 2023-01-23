@@ -3,6 +3,7 @@ package ru.practicum.shareit.item.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
@@ -14,11 +15,11 @@ import ru.practicum.shareit.item.service.ItemService;
 
 import javax.validation.Valid;
 import javax.validation.constraints.Min;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @RestController
+@Validated
 @RequiredArgsConstructor
 @RequestMapping("/items")
 public class ItemController {
@@ -47,19 +48,26 @@ public class ItemController {
     @GetMapping("/{itemId}")
     public ResponseEntity<ItemBookingDto> getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @Min(1L) @PathVariable Long itemId) {
-        return ResponseEntity.status(HttpStatus.OK).body(itemService.get(itemId, userId));
+        return ResponseEntity.status(HttpStatus.OK).body(mapper.toItemBookingDto(itemService.get(itemId, userId)));
     }
 
     @GetMapping
-    public ResponseEntity<List<ItemBookingDto>> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId) {
+    public ResponseEntity<List<ItemBookingDto>> getAllItem(@RequestHeader("X-Sharer-User-Id") Long userId,
+                                                            @Min(0)@RequestParam(defaultValue = "0") int from,
+                                                            @Min(1)@RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(new ArrayList<>(itemService.getAll(userId)));
+                .body(itemService.getAll(userId,from,size)
+                        .stream()
+                        .map(mapper::toItemBookingDto)
+                        .collect(Collectors.toList()));
     }
 
     @GetMapping("search")
-    public ResponseEntity<List<ItemDto>> search(@RequestParam String text) {
+    public ResponseEntity<List<ItemDto>> search(@RequestParam String text,
+                                                @Min(0)@RequestParam(defaultValue = "0") int from,
+                                                @Min(1)@RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
-                .body(itemService.search(text)
+                .body(itemService.search(text,from,size)
                         .stream()
                         .map(mapper::mapToItemDto)
                         .collect(Collectors.toList()));

@@ -1,6 +1,7 @@
 package ru.practicum.shareit.booking.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ru.practicum.shareit.booking.entity.BookingEntity;
@@ -15,7 +16,6 @@ import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -46,8 +46,7 @@ public class BookingServiceImpl implements BookingService {
         if (Objects.nonNull(item.getLastBooking()) || Objects.nonNull(item.getNextBooking())) {
             List<BookingEntity> bookings = repository.findAllByItem(item);
             for (BookingEntity b : bookings) {
-                if (booking.getStart().isAfter(b.getStart())
-                        && booking.getEnd().isBefore(b.getEnd())) {
+                if (booking.getStart().isAfter(b.getStart()) && booking.getEnd().isBefore(b.getEnd())) {
                     throw new NotFoundException("Вещь занята на это время");
                 }
             }
@@ -60,80 +59,77 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     public BookingEntity get(Long bookingId, Long userId) {
-        BookingEntity booking = repository.findById(bookingId)
-                .orElseThrow(NotFoundException::new);
-        if (Objects.equals(userId, booking.getItem().getOwner().getId())
-                || Objects.equals(userId, booking.getBooker().getId())) {
+        BookingEntity booking = repository.findById(bookingId).orElseThrow(NotFoundException::new);
+        if (Objects.equals(userId, booking.getItem().getOwner().getId()) || Objects.equals(userId, booking.getBooker().getId())) {
             return booking;
         }
         throw new NotFoundException("Аренда не найдена");
     }
 
     @Override
-    public List<BookingEntity> getAll(Long userId, BookingState state) {
+    public List<BookingEntity> getAll(Long userId, BookingState state, int from, int size) {
         List<BookingEntity> result;
         UserEntity booker = userService.get(userId);
         switch (state) {
             case ALL:
-                result = repository.findAllByBookerOrderByStartDesc(booker);
+                result = repository.findAllByBookerOrderByStartDesc(booker, PageRequest.of((from / size), size));
                 break;
             case CURRENT:
-                result = repository.findCurrentByBooker(booker, LocalDateTime.now());
+                result = repository.findCurrentByBookerOrderByStartDesc(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case PAST:
-                result = repository.findPastByBooker(booker, LocalDateTime.now());
+                result = repository.findPastByBookerOrderByStartDesc(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case FUTURE:
-                result = repository.findFutureByBooker(booker, LocalDateTime.now());
+                result = repository.findFutureByBookerOrderByStartDesc(booker, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case WAITING:
-                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.WAITING);
+                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.WAITING, PageRequest.of((from / size), size));
                 break;
             case REJECTED:
-                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.REJECTED);
+                result = repository.findAllByBookerAndStatusOrderByStartDesc(booker, BookingStatus.REJECTED, PageRequest.of((from / size), size));
                 break;
             case UNSUPPORTED_STATUS:
             default:
                 throw new UnsupportedStateException();
         }
-        return new ArrayList<>(result);
+        return result;
     }
 
     @Override
-    public List<BookingEntity> getAllOwnerItems(Long userId, BookingState state) {
+    public List<BookingEntity> getAllOwnerItems(Long userId, BookingState state, int from, int size) {
         List<BookingEntity> result;
         UserEntity owner = userService.get(userId);
         switch (state) {
             case ALL:
-                result = repository.findAllByOwnerItems(owner);
+                result = repository.findAllByOwnerItemsOrderByStartDesc(owner, PageRequest.of((from / size), size));
                 break;
             case CURRENT:
-                result = repository.findCurrentByOwnerItems(owner, LocalDateTime.now());
+                result = repository.findCurrentByOwnerItemsOrderByStartDesc(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case PAST:
-                result = repository.findPastByOwnerItems(owner, LocalDateTime.now());
+                result = repository.findPastByOwnerItemsOrderByStartDesc(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case FUTURE:
-                result = repository.findFutureByOwnerItems(owner, LocalDateTime.now());
+                result = repository.findFutureByOwnerItemsOrderByStartDesc(owner, LocalDateTime.now(), PageRequest.of((from / size), size));
                 break;
             case WAITING:
-                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.WAITING);
+                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.WAITING, PageRequest.of((from / size), size));
                 break;
             case REJECTED:
-                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.REJECTED);
+                result = repository.findAllByOwnerItemsAndStatusOrderByStartDesc(owner, BookingStatus.REJECTED, PageRequest.of((from / size), size));
                 break;
             case UNSUPPORTED_STATUS:
             default:
                 throw new UnsupportedStateException();
         }
-        return new ArrayList<>(result);
+        return result;
     }
 
     @Override
     @Transactional
     public BookingEntity approve(Long bookingId, Long userId, Boolean approved) {
-        BookingEntity stored = repository.findById(bookingId)
-                .orElseThrow(NotFoundException::new);
+        BookingEntity stored = repository.findById(bookingId).orElseThrow(NotFoundException::new);
         if (!Objects.equals(userId, stored.getItem().getOwner().getId())) {
             throw new NotFoundException();
         }

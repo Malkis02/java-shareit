@@ -8,7 +8,6 @@ import java.sql.Timestamp;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-@Builder
 public class CommentDto {
     private Long id;
 

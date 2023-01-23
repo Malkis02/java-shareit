@@ -1,6 +1,5 @@
 package ru.practicum.shareit.item.service;
 
-import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.item.model.Comment;
 
@@ -11,11 +10,11 @@ public interface ItemService {
 
     ItemEntity update(ItemEntity item, Long itemId);
 
-    ItemBookingDto get(Long itemId, Long userId);
+    ItemEntity get(Long itemId, Long userId);
 
-    List<ItemBookingDto> getAll(Long userId);
+    List<ItemEntity> getAll(Long userId, int from, int size);
 
-    List<ItemEntity> search(String text);
+    List<ItemEntity> search(String text, int from, int size);
 
     Comment createComment(Comment comment, Long itemId, Long userId);
 

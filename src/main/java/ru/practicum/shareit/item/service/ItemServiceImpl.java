@@ -1,17 +1,15 @@
 package ru.practicum.shareit.item.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import ru.practicum.shareit.booking.dto.BookingShortDto;
 import ru.practicum.shareit.booking.entity.BookingEntity;
-import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
-import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.item.mapper.CommentRepositoryMapper;
@@ -39,8 +37,6 @@ public class ItemServiceImpl implements ItemService {
 
     private final BookingRepository bookingRepository;
 
-    private final BookingRepositoryMapper bookingRepositoryMapper;
-
     private final ItemRepositoryMapper mapper;
 
     private final CommentRepositoryMapper commentRepositoryMapper;
@@ -48,7 +44,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     @Override
-    @Transactional
     public ItemEntity create(ItemEntity item, Long userId) {
         UserEntity user = userService.get(userId);
         return itemRepository.save(item);
@@ -64,30 +59,25 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public ItemBookingDto get(Long itemId, Long userId) {
+    public ItemEntity get(Long itemId, Long userId) {
         LocalDateTime now = LocalDateTime.now();
         ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
-        ItemBookingDto itemBookingDto = mapper.toItemBookingDto(itemStored);
+        List<BookingEntity> bookings = bookingRepository.findAllByItem(itemStored);
         if (itemStored.getOwner().getId().equals(userId)) {
-            BookingShortDto lastBooking =
-                    bookingRepository.findAllByItem(
-                                    itemStored)
+            BookingEntity lastBooking = bookings
                             .stream()
-                            .map(bookingRepositoryMapper::toLastBookingDto)
                             .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                            .max(Comparator.comparing(BookingShortDto::getStart))
+                            .min(Comparator.comparing(BookingEntity::getStart))
                             .orElse(null);
-            BookingShortDto nextBooking = bookingRepository.findAllByItem(
-                            itemStored)
+            BookingEntity nextBooking = bookings
                     .stream()
-                    .map(bookingRepositoryMapper::toLastBookingDto)
                     .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
-                    .max(Comparator.comparing(BookingShortDto::getStart))
+                    .min(Comparator.comparing(BookingEntity::getStart))
                     .orElse(null);
-            itemBookingDto.setLastBooking(lastBooking);
-            itemBookingDto.setNextBooking(nextBooking);
+            itemStored.setLastBooking(lastBooking);
+            itemStored.setNextBooking(nextBooking);
         }
-        return itemBookingDto;
+        return itemStored;
     }
 
     @Override
@@ -97,27 +87,24 @@ public class ItemServiceImpl implements ItemService {
     }
 
     @Override
-    public List<ItemBookingDto> getAll(Long userId) {
+    public List<ItemEntity> getAll(Long userId, int from, int size) {
         LocalDateTime now = LocalDateTime.now();
-        List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId);
-        List<ItemBookingDto> itemList = new ArrayList<>();
+        List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId, PageRequest.of((from / size), size));
+        List<ItemEntity> itemList = new ArrayList<>();
         for (ItemEntity item : stored) {
             if (item.getOwner().getId().equals(userId)) {
                 List<BookingEntity> bookingList = bookingRepository.findAllByItem(item);
-                ItemBookingDto itemBookingDto = mapper.toItemBookingDto(item);
-                itemBookingDto.setLastBooking(bookingList
+                item.setLastBooking(bookingList
                         .stream()
-                        .map(bookingRepositoryMapper::toLastBookingDto)
                         .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                        .max(Comparator.comparing(BookingShortDto::getStart))
+                        .min(Comparator.comparing(BookingEntity::getStart))
                         .orElse(null));
-                itemBookingDto.setNextBooking(bookingList
+                item.setNextBooking(bookingList
                         .stream()
-                        .map(bookingRepositoryMapper::toLastBookingDto)
                         .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
-                        .max(Comparator.comparing(BookingShortDto::getStart))
+                        .min(Comparator.comparing(BookingEntity::getStart))
                         .orElse(null));
-                itemList.add(itemBookingDto);
+                itemList.add(item);
             }
         }
         return itemList;
@@ -127,6 +114,7 @@ public class ItemServiceImpl implements ItemService {
     @Transactional
     public Comment createComment(Comment comment, Long itemId, Long userId) {
         UserEntity user = userService.get(userId);
+        ItemEntity item = getItem(itemId);
         if (comment.getText().isEmpty() || comment.getText().isBlank()) {
             throw new ItemNotAvailableException();
         }
@@ -135,16 +123,18 @@ public class ItemServiceImpl implements ItemService {
             throw new ItemNotAvailableException();
         }
         comment.setCreated(Timestamp.valueOf(LocalDateTime.now()));
-        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment, user, itemId);
-        return commentRepositoryMapper.toComment(commentRepository.save(commentEntity), user, itemId);
+        CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment, user, item);
+        return commentRepositoryMapper.toComment(commentRepository.save(commentEntity), user, item);
     }
 
-    public List<ItemEntity> search(String text) {
+    @Override
+    public List<ItemEntity> search(String text, int from, int size) {
         if (!StringUtils.hasText(text)) {
             return Collections.emptyList();
         }
         return new ArrayList<>(itemRepository
-                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(text, text));
+                .findAllByNameContainingIgnoreCaseOrDescriptionContainingIgnoreCaseAndAvailableTrue(
+                        text, text, PageRequest.of((from / size), size)));
     }
 
     private void validate(Long itemId, ItemEntity item) {
