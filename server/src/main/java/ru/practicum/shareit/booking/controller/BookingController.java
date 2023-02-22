@@ -35,14 +35,14 @@ public class BookingController {
                         .create(bookingMapper.toBookingEntity(booking), userId, booking.getItemId())));
     }
 
-    @GetMapping("/{bookingId}")
+    @GetMapping("{bookingId}")
     public ResponseEntity<BookingDto> getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                  @Min(1L) @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingMapper.toBookingDto(bookingService.get(bookingId, userId)));
     }
 
-    @PatchMapping("/{bookingId}")
+    @PatchMapping("{bookingId}")
     public ResponseEntity<BookingUpdateResponseDto> update(@RequestParam("approved") Boolean approved,
                                                            @RequestHeader("X-Sharer-User-Id") Long userId,
                                                            @Min(1L) @PathVariable Long bookingId) {
@@ -63,7 +63,7 @@ public class BookingController {
                         .collect(Collectors.toList()));
     }
 
-    @GetMapping("/owner")
+    @GetMapping("owner")
     public ResponseEntity<List<BookingDto>> getOwnerItemsAll(
             @RequestParam(defaultValue = "ALL", required = false) BookingState state,
             @RequestHeader("X-Sharer-User-Id") Long userId,

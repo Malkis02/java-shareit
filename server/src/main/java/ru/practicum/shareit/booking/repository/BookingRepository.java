@@ -11,6 +11,7 @@ import ru.practicum.shareit.user.entity.UserEntity;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
     List<BookingEntity> findAllByBookerOrderByStartDesc(UserEntity booker,
@@ -64,6 +65,10 @@ public interface BookingRepository extends JpaRepository<BookingEntity, Long> {
                                                Pageable pageable);
 
     List<BookingEntity> findAllByItem(ItemEntity item);
+
+    Optional<BookingEntity> findFirstByItemAndStatusIsOrderByStartAsc(ItemEntity item, BookingStatus status);
+
+    Optional<BookingEntity> findFirstByItemAndStatusIsOrderByEndDesc(ItemEntity item, BookingStatus status);
 
     boolean existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
             Long itemId,

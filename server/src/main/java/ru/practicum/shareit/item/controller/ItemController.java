@@ -13,6 +13,7 @@ import ru.practicum.shareit.item.mapper.CommentMapper;
 import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.service.ItemService;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -35,7 +36,7 @@ public class ItemController {
                 .body(mapper.mapToItemDto(itemService.create(mapper.mapToItem(item, userId), userId)));
     }
 
-    @PatchMapping("/{itemId}")
+    @PatchMapping("{itemId}")
     public ResponseEntity<ItemDto> updateItem(@PathVariable Long itemId,
                                               @RequestHeader("X-Sharer-User-Id") Long userId,
                                               @RequestBody UpdateItemDto item) {
@@ -43,7 +44,7 @@ public class ItemController {
                 .body(mapper.mapToItemDto(itemService.update(mapper.mapToItem(item, userId), itemId)));
     }
 
-    @GetMapping("/{itemId}")
+    @GetMapping("{itemId}")
     public ResponseEntity<ItemBookingDto> getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @PathVariable Long itemId) {
         return ResponseEntity.status(HttpStatus.OK).body(mapper.toItemBookingDto(itemService.get(itemId, userId)));
@@ -57,6 +58,7 @@ public class ItemController {
                 .body(itemService.getAll(userId,from,size)
                         .stream()
                         .map(mapper::toItemBookingDto)
+                        .sorted(Comparator.comparingLong(ItemBookingDto::getId))
                         .collect(Collectors.toList()));
     }
 
@@ -71,7 +73,7 @@ public class ItemController {
                         .collect(Collectors.toList()));
     }
 
-    @PostMapping("/{itemId}/comment")
+    @PostMapping("{itemId}/comment")
     public ResponseEntity<CommentDto> createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @RequestBody CommentDto comment,
                                                     @PathVariable Long itemId) {

@@ -5,7 +5,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
-import ru.practicum.shareit.booking.entity.BookingEntity;
 import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
@@ -17,7 +16,9 @@ import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.entity.UserEntity;
+import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.sql.Timestamp;
@@ -40,6 +41,8 @@ public class ItemServiceImpl implements ItemService {
 
     private final CommentRepository commentRepository;
 
+    private final ItemRequestRepository requestRepository;
+    private final UserRepository userRepository;
 
 
     @Override
@@ -60,22 +63,14 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public ItemEntity get(Long itemId, Long userId) {
-        LocalDateTime now = LocalDateTime.now();
         ItemEntity itemStored = itemRepository.findById(itemId).orElseThrow(NotFoundException::new);
-        List<BookingEntity> bookings = bookingRepository.findAllByItem(itemStored);
         if (itemStored.getOwner().getId().equals(userId)) {
-            BookingEntity lastBooking = bookings
-                            .stream()
-                            .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                            .max(Comparator.comparing(BookingEntity::getStart))
-                            .orElse(null);
-            BookingEntity nextBooking = bookings
-                    .stream()
-                    .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
-                    .min(Comparator.comparing(BookingEntity::getStart))
-                    .orElse(null);
-            itemStored.setLastBooking(lastBooking);
-            itemStored.setNextBooking(nextBooking);
+            itemStored.setLastBooking(bookingRepository.findFirstByItemAndStatusIsOrderByStartAsc(
+                            itemStored,BookingStatus.APPROVED)
+                    .orElse(null));
+            itemStored.setNextBooking(bookingRepository.findFirstByItemAndStatusIsOrderByEndDesc(
+                            itemStored,BookingStatus.APPROVED)
+                    .orElse(null));
         }
         return itemStored;
     }
@@ -88,21 +83,15 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     public List<ItemEntity> getAll(Long userId, int from, int size) {
-        LocalDateTime now = LocalDateTime.now();
         List<ItemEntity> stored = itemRepository.findAllByOwnerId(userId, PageRequest.of((from / size), size));
         List<ItemEntity> itemList = new ArrayList<>();
         for (ItemEntity item : stored) {
             if (item.getOwner().getId().equals(userId)) {
-                List<BookingEntity> bookingList = bookingRepository.findAllByItem(item);
-                item.setLastBooking(bookingList
-                        .stream()
-                        .filter(bookingShortDto -> bookingShortDto.getStart().isBefore(now))
-                        .min(Comparator.comparing(BookingEntity::getStart))
+                item.setLastBooking(bookingRepository.findFirstByItemAndStatusIsOrderByStartAsc(
+                        item,BookingStatus.APPROVED)
                         .orElse(null));
-                item.setNextBooking(bookingList
-                        .stream()
-                        .filter(bookingShortDto -> bookingShortDto.getStart().isAfter(now))
-                        .min(Comparator.comparing(BookingEntity::getStart))
+                item.setNextBooking(bookingRepository.findFirstByItemAndStatusIsOrderByEndDesc(
+                        item,BookingStatus.APPROVED)
                         .orElse(null));
                 itemList.add(item);
             }
@@ -120,7 +109,7 @@ public class ItemServiceImpl implements ItemService {
         }
         if (!bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
                 itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())) {
-            throw new ItemNotAvailableException();
+            throw new ItemNotAvailableException("Bookings not found");
         }
         comment.setCreated(Timestamp.valueOf(LocalDateTime.now()));
         CommentEntity commentEntity = commentRepositoryMapper.toEntity(comment, user, item);

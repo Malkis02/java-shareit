@@ -26,14 +26,14 @@ public class ItemController {
         return client.createItem(userId,item);
     }
 
-    @PatchMapping("/{itemId}")
+    @PatchMapping("{itemId}")
     public ResponseEntity<Object> updateItem(@Min(1L) @PathVariable Long itemId,
                                               @RequestHeader("X-Sharer-User-Id") Long userId,
                                               @Valid @RequestBody UpdateItemDto item) {
         return client.updateItem(userId,itemId,item);
     }
 
-    @GetMapping("/{itemId}")
+    @GetMapping("{itemId}")
     public ResponseEntity<Object> getItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                   @Min(1L) @PathVariable Long itemId) {
         return client.getItem(userId,itemId);
@@ -54,7 +54,7 @@ public class ItemController {
         return client.search(userId,from,size,text);
     }
 
-    @PostMapping("/{itemId}/comment")
+    @PostMapping("{itemId}/comment")
     public ResponseEntity<Object> createComment(@RequestHeader("X-Sharer-User-Id") Long userId,
                                                     @RequestBody CommentDto comment,
                                                     @PathVariable Long itemId) {

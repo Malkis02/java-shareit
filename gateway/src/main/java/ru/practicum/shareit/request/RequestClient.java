@@ -28,11 +28,11 @@ public class RequestClient extends BaseClient {
         );
     }
 
-    public ResponseEntity<Object> createRequest(Long userId, @Valid ItemRequestDto dto) {
+    public ResponseEntity<Object> createRequest(long userId, @Valid ItemRequestDto dto) {
         return post("",userId,dto);
     }
 
-    public ResponseEntity<Object> getRequest(Long userId, Long requestId) {
+    public ResponseEntity<Object> getRequest(long userId, Long requestId) {
         return get("/" + requestId,userId);
     }
 
@@ -44,7 +44,7 @@ public class RequestClient extends BaseClient {
         return get("/all?from={from}&size={size}", userId, parameters);
     }
 
-    public ResponseEntity<Object> getAllRequestsWithoutPage(Long userId) {
+    public ResponseEntity<Object> getAllRequestsWithoutPage(long userId) {
         return get("",userId);
     }
 }
