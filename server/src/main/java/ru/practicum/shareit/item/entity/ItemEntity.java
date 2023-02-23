@@ -43,7 +43,7 @@ public class ItemEntity {
     @Transient
     private BookingEntity nextBooking;
 
-    @ManyToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "request_id")
     private ItemRequestEntity request;
 

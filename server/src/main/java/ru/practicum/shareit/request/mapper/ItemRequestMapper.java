@@ -16,10 +16,10 @@ public interface ItemRequestMapper {
 
     @Mapping(target = "requestor.id",source = "userId")
     @Mapping(target = "created",source = "itemDto.created")
-//    @Mapping(target = "items",source = "itemDto.items")
+    @Mapping(target = "items",source = "itemDto.items")
     ItemRequestEntity toItemRequestEntity(ItemRequestDto itemDto,Long userId);
 
     @Mapping(target = "created",source = "created")
-    //@Mapping(target = "items",source = "items")
+    @Mapping(target = "items",source = "items")
     ItemRequestDto toItemRequestDto(ItemRequestEntity entity);
 }

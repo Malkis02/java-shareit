@@ -1,9 +1,6 @@
 package ru.practicum.shareit.item.mapper;
 
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingTarget;
-import org.mapstruct.NullValuePropertyMappingStrategy;
+import org.mapstruct.*;
 import ru.practicum.shareit.item.dto.CommentDto;
 import ru.practicum.shareit.item.dto.ItemBookingDto;
 import ru.practicum.shareit.item.dto.ItemDto;
@@ -15,11 +12,12 @@ import ru.practicum.shareit.item.entity.ItemEntity;
 @Mapper(componentModel = "spring",
         nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ItemRepositoryMapper {
+
     @Mapping(target = "owner.id", source = "userId")
-    @Mapping(target = "request.id",source = "itemDto.requestId")
+    //@Mapping(target = "request.id",source = "itemDto.requestId")
     ItemEntity mapToItem(ItemDto itemDto, Long userId);
 
-    @Mapping(target = "requestId",source = "item.request.id")
+    //@Mapping(target = "requestId",source = "item.request.id")
     ItemDto mapToItemDto(ItemEntity item);
 
     @Mapping(target = "lastBooking.bookerId",source = "lastBooking.booker.id")
