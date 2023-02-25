@@ -9,6 +9,7 @@ import ru.practicum.shareit.booking.model.BookingStatus;
 import ru.practicum.shareit.booking.repository.BookingRepository;
 import ru.practicum.shareit.exception.ItemNotAvailableException;
 import ru.practicum.shareit.exception.NotFoundException;
+import ru.practicum.shareit.item.dto.ItemDto;
 import ru.practicum.shareit.item.entity.CommentEntity;
 import ru.practicum.shareit.item.entity.ItemEntity;
 import ru.practicum.shareit.item.mapper.CommentRepositoryMapper;
@@ -16,6 +17,7 @@ import ru.practicum.shareit.item.mapper.ItemRepositoryMapper;
 import ru.practicum.shareit.item.model.Comment;
 import ru.practicum.shareit.item.repository.CommentRepository;
 import ru.practicum.shareit.item.repository.ItemRepository;
+import ru.practicum.shareit.request.entity.ItemRequestEntity;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.entity.UserEntity;
 import ru.practicum.shareit.user.repository.UserRepository;
@@ -47,9 +49,16 @@ public class ItemServiceImpl implements ItemService {
 
     @Override
     @Transactional
-    public ItemEntity create(ItemEntity item, Long userId) {
-        UserEntity user = userService.get(userId);
-        return itemRepository.save(item);
+    public ItemEntity create(ItemDto item, Long userId) {
+        ItemEntity newItem = mapper.mapToItem(item,userId);
+         if (item.getRequestId() != null) {
+             ItemRequestEntity itemRequest = requestRepository.findById(item.getRequestId())
+                     .orElseThrow(() -> new NotFoundException("Запроса с id=" +
+                             item.getRequestId() + " нет"));
+             newItem.setRequest(itemRequest);
+         }
+        newItem.setOwner(userService.get(userId));
+        return itemRepository.save(newItem);
     }
 
     @Override

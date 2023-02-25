@@ -14,10 +14,10 @@ import ru.practicum.shareit.item.entity.ItemEntity;
 public interface ItemRepositoryMapper {
 
     @Mapping(target = "owner.id", source = "userId")
-    //@Mapping(target = "request.id",source = "itemDto.requestId")
+    //@Mapping(target = "request.id",source = "itemDto.requestId",nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
     ItemEntity mapToItem(ItemDto itemDto, Long userId);
 
-    //@Mapping(target = "requestId",source = "item.request.id")
+    @Mapping(target = "requestId",source = "item.request.id")
     ItemDto mapToItemDto(ItemEntity item);
 
     @Mapping(target = "lastBooking.bookerId",source = "lastBooking.booker.id")

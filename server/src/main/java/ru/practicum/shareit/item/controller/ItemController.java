@@ -33,7 +33,7 @@ public class ItemController {
     public ResponseEntity<ItemDto> createItem(@RequestHeader("X-Sharer-User-Id") Long userId,
                                               @RequestBody ItemDto item) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(mapper.mapToItemDto(itemService.create(mapper.mapToItem(item, userId), userId)));
+                .body(mapper.mapToItemDto(itemService.create(item,userId)));
     }
 
     @PatchMapping("{itemId}")
