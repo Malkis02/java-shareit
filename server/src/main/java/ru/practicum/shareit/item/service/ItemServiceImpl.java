@@ -20,7 +20,6 @@ import ru.practicum.shareit.item.repository.ItemRepository;
 import ru.practicum.shareit.request.entity.ItemRequestEntity;
 import ru.practicum.shareit.request.repository.ItemRequestRepository;
 import ru.practicum.shareit.user.entity.UserEntity;
-import ru.practicum.shareit.user.repository.UserRepository;
 import ru.practicum.shareit.user.service.UserService;
 
 import java.sql.Timestamp;
@@ -44,7 +43,6 @@ public class ItemServiceImpl implements ItemService {
     private final CommentRepository commentRepository;
 
     private final ItemRequestRepository requestRepository;
-    private final UserRepository userRepository;
 
 
     @Override
@@ -113,9 +111,6 @@ public class ItemServiceImpl implements ItemService {
     public Comment createComment(Comment comment, Long itemId, Long userId) {
         UserEntity user = userService.get(userId);
         ItemEntity item = getItem(itemId);
-        if (comment.getText().isEmpty() || comment.getText().isBlank()) {
-            throw new ItemNotAvailableException();
-        }
         if (!bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
                 itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())) {
             throw new ItemNotAvailableException("Bookings not found");

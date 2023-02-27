@@ -53,7 +53,7 @@ public class BookingController {
     @GetMapping
     public ResponseEntity<List<BookingDto>> getAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "ALL", required = false) BookingState state,
+            @RequestParam(defaultValue = "ALL") BookingState state,
             @Min(0)@RequestParam(defaultValue = "0") int from,
             @Min(1)@RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
@@ -65,7 +65,7 @@ public class BookingController {
 
     @GetMapping("owner")
     public ResponseEntity<List<BookingDto>> getOwnerItemsAll(
-            @RequestParam(defaultValue = "ALL", required = false) BookingState state,
+            @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @Min(0)@RequestParam(defaultValue = "0") int from,
             @Min(1)@RequestParam(defaultValue = "10") int size) {
