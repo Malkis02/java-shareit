@@ -111,6 +111,9 @@ public class ItemServiceImpl implements ItemService {
     public Comment createComment(Comment comment, Long itemId, Long userId) {
         UserEntity user = userService.get(userId);
         ItemEntity item = getItem(itemId);
+        if (comment.getText().isEmpty() || comment.getText().isBlank()) {
+            throw new ItemNotAvailableException();
+        }
         if (!bookingRepository.existsBookingByItem_IdAndBooker_IdAndStatusAndEndIsBefore(
                 itemId, userId, BookingStatus.APPROVED, LocalDateTime.now())) {
             throw new ItemNotAvailableException("Bookings not found");
