@@ -12,8 +12,6 @@ import ru.practicum.shareit.booking.mapper.BookingRepositoryMapper;
 import ru.practicum.shareit.booking.model.BookingState;
 import ru.practicum.shareit.booking.service.BookingService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -29,7 +27,7 @@ public class BookingController {
 
     @PostMapping
     public ResponseEntity<BookingDto> createBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                    @Valid @RequestBody BookingCreateRequestDto booking) {
+                                                    @RequestBody BookingCreateRequestDto booking) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(bookingMapper.toBookingDto(bookingService
                         .create(bookingMapper.toBookingEntity(booking), userId, booking.getItemId())));
@@ -37,7 +35,7 @@ public class BookingController {
 
     @GetMapping("{bookingId}")
     public ResponseEntity<BookingDto> getBooking(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @Min(1L) @PathVariable Long bookingId) {
+                                                 @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingMapper.toBookingDto(bookingService.get(bookingId, userId)));
     }
@@ -45,7 +43,7 @@ public class BookingController {
     @PatchMapping("{bookingId}")
     public ResponseEntity<BookingUpdateResponseDto> update(@RequestParam("approved") Boolean approved,
                                                            @RequestHeader("X-Sharer-User-Id") Long userId,
-                                                           @Min(1L) @PathVariable Long bookingId) {
+                                                           @PathVariable Long bookingId) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingMapper.toBookingUpdateResponseDto(bookingService.approve(bookingId, userId, approved)));
     }
@@ -54,8 +52,8 @@ public class BookingController {
     public ResponseEntity<List<BookingDto>> getAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
             @RequestParam(defaultValue = "ALL") BookingState state,
-            @Min(0)@RequestParam(defaultValue = "0") int from,
-            @Min(1)@RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingService.getAll(userId, state,from,size)
                         .stream()
@@ -67,8 +65,8 @@ public class BookingController {
     public ResponseEntity<List<BookingDto>> getOwnerItemsAll(
             @RequestParam(defaultValue = "ALL") BookingState state,
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Min(0)@RequestParam(defaultValue = "0") int from,
-            @Min(1)@RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(bookingService.getAllOwnerItems(userId, state,from,size).stream()
                         .map(bookingMapper::toBookingDto)

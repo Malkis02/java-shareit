@@ -6,6 +6,10 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import ru.practicum.shareit.request.dto.ItemRequestDto;
 
+import javax.validation.Valid;
+import javax.validation.constraints.Positive;
+import javax.validation.constraints.PositiveOrZero;
+
 
 @RestController
 @Validated
@@ -18,22 +22,22 @@ public class RequestController {
 
     @PostMapping
     public ResponseEntity<Object> create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                         @RequestBody ItemRequestDto item) {
+                                         @Valid @RequestBody ItemRequestDto item) {
         return client.createRequest(userId, item);
     }
 
 
     @GetMapping("{requestId}")
     public ResponseEntity<Object> get(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                      @PathVariable Long requestId) {
+                                      @Positive @PathVariable Long requestId) {
         return client.getRequest(userId, requestId);
     }
 
     @GetMapping("/all")
     public ResponseEntity<Object> getAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @RequestParam(defaultValue = "0") int from,
-            @RequestParam(defaultValue = "10") int size) {
+            @PositiveOrZero @RequestParam(defaultValue = "0") int from,
+            @Positive @RequestParam(defaultValue = "10") int size) {
         return client.getAllRequests(userId, from, size);
     }
 

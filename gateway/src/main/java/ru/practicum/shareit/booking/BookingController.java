@@ -24,7 +24,7 @@ public class BookingController {
 
     @GetMapping
     public ResponseEntity<Object> getBookings(@RequestHeader("X-Sharer-User-Id") long userId,
-                                              @RequestParam(name = "state", defaultValue = "ALL", required = false) BookingState state,
+                                              @RequestParam(name = "state", defaultValue = "ALL") BookingState state,
                                               @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
                                               @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Get booking with state {}, userId={}, from={}, size={}", state, userId, from, size);
@@ -49,13 +49,14 @@ public class BookingController {
     public ResponseEntity<Object> update(@RequestParam("approved") Boolean approved,
                                          @RequestHeader("X-Sharer-User-Id") Long userId,
                                          @Min(1L) @PathVariable Long bookingId) {
+        log.info("Patch booking {}, userId={}", bookingId, userId);
         return bookingClient.updateBooking(userId, bookingId, approved);
     }
 
     @GetMapping("owner")
     public ResponseEntity<Object> getOwnerItemsAll(
             @RequestHeader("X-Sharer-User-Id") long userId,
-            @RequestParam(name = "state", defaultValue = "ALL", required = false) BookingState state,
+            @RequestParam(name = "state", defaultValue = "ALL") BookingState state,
             @PositiveOrZero @RequestParam(name = "from", defaultValue = "0") Integer from,
             @Positive @RequestParam(name = "size", defaultValue = "10") Integer size) {
         log.info("Get booking with state {}, userId={}, from={}, size={}", state, userId, from, size);

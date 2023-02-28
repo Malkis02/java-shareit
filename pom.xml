@@ -126,14 +126,6 @@
 					<version>0.8.8</version>
 					<configuration>
 						<output>file</output>
-						<excludes>
-							<exclude>**/*CommentMapperImpl.*</exclude>
-							<exclude>**/*CommentRepositoryMapperImpl.*</exclude>
-							<exclude>**/*ItemRepositoryMapperImpl.*</exclude>
-							<exclude>**/*BookingRepositoryMapperImpl.*</exclude>
-							<exclude>**/*ItemRequestMapperImpl.*</exclude>
-							<exclude>**/*UserRepositoryMapperImpl.*</exclude>
-						</excludes>
 					</configuration>
 					<executions>
 						<execution>
@@ -148,14 +140,6 @@
 								<goal>check</goal>
 							</goals>
 							<configuration>
-								<excludes>
-									<exclude>**/*CommentMapperImpl.*</exclude>
-									<exclude>**/*CommentRepositoryMapperImpl.*</exclude>
-									<exclude>**/*ItemRepositoryMapperImpl.*</exclude>
-									<exclude>**/*BookingRepositoryMapperImpl.*</exclude>
-									<exclude>**/*ItemRequestMapperImpl.*</exclude>
-									<exclude>**/*UserRepositoryMapperImpl.*</exclude>
-								</excludes>
 								<rules>
 									<rule>
 										<element>BUNDLE</element>

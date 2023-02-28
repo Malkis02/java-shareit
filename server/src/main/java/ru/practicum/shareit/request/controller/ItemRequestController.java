@@ -9,8 +9,6 @@ import ru.practicum.shareit.request.dto.ItemRequestDto;
 import ru.practicum.shareit.request.mapper.ItemRequestMapper;
 import ru.practicum.shareit.request.service.ItemRequestService;
 
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -27,7 +25,7 @@ public class ItemRequestController {
 
     @PostMapping
     public ResponseEntity<ItemRequestDto> create(@RequestHeader("X-Sharer-User-Id") Long userId,
-                                                 @Valid @RequestBody ItemRequestDto item) {
+                                                 @RequestBody ItemRequestDto item) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(mapper.toItemRequestDto(itemRequestService.create(mapper.toItemRequestEntity(item,userId),userId)));
     }
@@ -43,8 +41,8 @@ public class ItemRequestController {
     @GetMapping("/all")
     public ResponseEntity<List<ItemRequestDto>> getAll(
             @RequestHeader("X-Sharer-User-Id") Long userId,
-            @Min(0)@RequestParam(defaultValue = "0") int from,
-            @Min(1)@RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "0") int from,
+            @RequestParam(defaultValue = "10") int size) {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(itemRequestService.getAll(userId,from,size)
                         .stream()
